@@ -186,6 +186,8 @@ func (s *serveCmdOptions) login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "username or password not specified"})
 	}
 
+	data.Username = strings.ToLower(data.Username)
+
 	// TODO: check login
 	user := db.User{}
 	err = s.db.GetWhereIs(&user, "username", data.Username)
