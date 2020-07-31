@@ -22,7 +22,7 @@ type Klant struct {
 	Einddatum           string `json:"einddatum"` // TODO: make this time.Time post-Zoho
 	TypeVoeding         string `json:"typeVoeding"`
 	AantalOnder12Jaar   int    `json:"aantalOnder12Jaar"`   // TODO: make this automated post-Zoho
-	AantalBovenOf12Jaar int    `json:"bantalBovenOf12Jaar"` // TODO: make this automated post-Zoho
+	AantalBovenOf12Jaar int    `json:"aantalBovenOf12Jaar"` // TODO: make this automated post-Zoho
 }
 
 // this is klant as is defined in the Zoho data

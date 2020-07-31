@@ -4,6 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	v1 "github.com/moedersvoormoeders/api.mvm.digital/pkg/api/v1"
+
+	"github.com/dgrijalva/jwt-go"
+
 	"log"
 	"net/http"
 	"os"
@@ -11,17 +16,16 @@ import (
 	"strings"
 	"time"
 
-	zohohttp "github.com/moedersvoormoeders/api.mvm.digital/pkg/api/zoho"
-	"github.com/moedersvoormoeders/api.mvm.digital/pkg/zoho"
-
-	"github.com/dgrijalva/jwt-go"
-	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
+
+	"github.com/moedersvoormoeders/api.mvm.digital/pkg/api/auth"
+	zohohttp "github.com/moedersvoormoeders/api.mvm.digital/pkg/api/zoho"
+	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
+	"github.com/moedersvoormoeders/api.mvm.digital/pkg/zoho"
 )
 
 // this is used to compare to in case of no user found to keep the response time the same
@@ -32,12 +36,6 @@ func init() {
 }
 
 var protectedEntryPoints = []string{"/zoho", "/v1"}
-
-type jwtClaims struct {
-	Name string `json:"name"`
-	// TODO: roles
-	jwt.StandardClaims
-}
 
 type serveCmdOptions struct {
 	BindAddr string
@@ -130,9 +128,10 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	e.HideBanner = true
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey: s.jwtSecret,
-		Claims:     &jwtClaims{},
+		Claims:     &auth.Claim{},
 		Skipper: func(c echo.Context) bool {
 			// always skip JWT unless path is a protectedPrefix
 			for _, protectedPrefix := range protectedEntryPoints {
@@ -152,6 +151,7 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	if s.zohoClientID != "" {
 		zohohttp.NewHTTPHandler().Register(e, s.zohoCRM)
 	}
+	v1.NewHTTPHandler().Register(e)
 
 	go func() {
 		e.Start(fmt.Sprintf("%s:%d", s.BindAddr, s.Port))
@@ -170,28 +170,36 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	}
 }
 
-func (s *serveCmdOptions) login(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
+type AuthData struct {
+	Username string `form:"username" json:"username"`
+	Password string `form:"password" json:"password"`
+}
 
-	if username == "" || password == "" {
+func (s *serveCmdOptions) login(c echo.Context) error {
+	data := new(AuthData)
+	err := c.Bind(data)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if data.Username == "" || data.Password == "" {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "username or password not specified"})
 	}
 
 	// TODO: check login
 	user := db.User{}
-	err := s.db.GetWhereIs(&user, "username", username)
+	err = s.db.GetWhereIs(&user, "username", data.Username)
 	if errors.Is(err, db.ErrorNotFound) {
-		_ = bcrypt.CompareHashAndPassword([]byte(dummyHash), []byte(password))
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "username or password incorrect"})
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyHash), []byte(data.Password))
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "username or password incorrect"})
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "username or password incorrect"})
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password)); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "username or password incorrect"})
 	}
 
 	// Set custom claims
-	claims := &jwtClaims{
+	claims := &auth.Claim{
 		user.Name,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),

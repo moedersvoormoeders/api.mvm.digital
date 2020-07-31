@@ -3,6 +3,7 @@ module github.com/moedersvoormoeders/api.mvm.digital
 go 1.14
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/jinzhu/gorm v1.9.15
 	github.com/labstack/echo v3.3.10+incompatible // indirect

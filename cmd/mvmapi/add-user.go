@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,8 +30,8 @@ func NewAddUserCmd() *cobra.Command {
 		RunE:    a.RunE,
 	}
 	c.Flags().StringVarP(&a.Username, "username", "u", "", "Username for the user")
-	c.Flags().StringVarP(&a.Username, "password", "p", "", "Password for the user")
-	c.Flags().StringVarP(&a.Username, "name", "n", "", "Visible name fore the user")
+	c.Flags().StringVarP(&a.Password, "password", "p", "", "Password for the user")
+	c.Flags().StringVarP(&a.Name, "name", "n", "", "Visible name fore the user")
 
 	viper.BindPFlags(c.Flags())
 
@@ -73,7 +74,7 @@ func (a *addUserCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error hashing password: %w", err)
 	}
 
-	_, err = dbConn.Add(db.User{
+	err = dbConn.Add(&db.User{
 		Name:     a.Name,
 		Username: a.Username,
 		Password: string(hashedPassword),

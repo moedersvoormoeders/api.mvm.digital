@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -49,13 +50,13 @@ func (c *Connection) AutoMigrate() error {
 	return nil
 }
 
-func (c *Connection) Add(obj interface{}) (uint, error) {
+func (c *Connection) Add(obj interface{}) error {
 	res := c.db.Create(obj)
 	if res.Error != nil {
-		return 0, res.Error
+		return res.Error
 	}
 
-	return res.Value.(*gorm.Model).ID, nil
+	return nil
 }
 
 func (c *Connection) GetID(obj interface{}, id uint) error {
@@ -72,7 +73,7 @@ func (c *Connection) GetID(obj interface{}, id uint) error {
 }
 
 func (c *Connection) GetWhereIs(obj interface{}, property string, where interface{}) error {
-	res := c.db.First(&obj, fmt.Sprintf("%s = ?", property), where)
+	res := c.db.First(obj, fmt.Sprintf("%s = ?", property), where)
 
 	if res.Error != nil {
 		return res.Error
