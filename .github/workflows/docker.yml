@@ -26,7 +26,7 @@ jobs:
           cp /usr/bin/$QEMU_BIN ./
           docker build . --build-arg="ARCH=${{ matrix.arch }}" --build-arg="QEMU_BIN=$QEMU_BIN" --file Dockerfile --tag moedersvoormoeders/api:${{ matrix.arch }}-$GITHUB_SHA
       - name: Log in to registry
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u "meyskens" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "meyskens" --password-stdin
       - name: Push image
         run: docker push  moedersvoormoeders/api:${{ matrix.arch }}-$GITHUB_SHA
   publish-manifest:
@@ -34,7 +34,7 @@ jobs:
     needs: [build]
     steps:
       - name: Log in to registry
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u "meyskens" --password-stdinn
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "meyskens" --password-stdinn
       - name: Create Manifest
         run: |
           docker manifest create $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:amd64-$GITHUB_SHA $DOCKER_PREFIX:arm32v7-$GITHUB_SHA $DOCKER_PREFIX:arm64v8-$GITHUB_SHA
