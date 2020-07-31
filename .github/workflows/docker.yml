@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [amd64, armhf, arm64v8]
+        arch: [amd64, arm32v7, arm64v8]
     steps:
       - uses: actions/checkout@v1
       - name: Get qemu-user-static
@@ -37,9 +37,9 @@ jobs:
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u "meyskens" --password-stdinn
       - name: Create Manifest
         run: |
-          docker manifest create $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:amd64-$GITHUB_SHA $DOCKER_PREFIX:armhf-$GITHUB_SHA $DOCKER_PREFIX:arm64v8-$GITHUB_SHA
+          docker manifest create $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:amd64-$GITHUB_SHA $DOCKER_PREFIX:arm32v7-$GITHUB_SHA $DOCKER_PREFIX:arm64v8-$GITHUB_SHA
           docker manifest annotate $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:amd64-$GITHUB_SHA --arch amd64
-          docker manifest annotate $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:armhf-$GITHUB_SHA --arch arm --variant v7
+          docker manifest annotate $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:arm32v7-$GITHUB_SHA --arch arm --variant v7
           docker manifest annotate $DOCKER_PREFIX:$GITHUB_SHA $DOCKER_PREFIX:arm64v8-$GITHUB_SHA --arch arm64 --variant armv8
           docker manifest push $DOCKER_PREFIX:$GITHUB_SHA
         env:
