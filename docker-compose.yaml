@@ -1,7 +1,13 @@
 version: '2.0'
 services:
   api:
-    build: .
+    restart: always
+    env_file:
+      - api.env
+    build:
+      context: .
+      args:
+        ARCH: library # will pick up the user's system arch with manifests
     ports:
       - 8080:8080
     links:
@@ -13,6 +19,7 @@ services:
       POSTGRES_PASSWORD: "moedersvoormoeders"
     volumes:
       - postgresdb:/var/lib/postgresql/data
+      - apiWorkdir:/opt/mvm-api/
   adminer:
     image: adminer
     restart: always
@@ -22,3 +29,4 @@ services:
       - 8081:8080
 volumes:
   postgresdb: {}
+  apiWorkdir: {}

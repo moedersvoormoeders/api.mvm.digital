@@ -16,6 +16,9 @@ FROM $ARCH/alpine:3.12
 
 COPY --from=build /home/user/go/src/github.com/moedersvoormoeders/api.mvm.digital/mvmapi /usr/local/bin/
 
+RUN mkdir /opt/mvm-api
+WORKDIR /opt/mvm-api
+
 ENTRYPOINT ["/usr/local/bin/mvmapi"]
 CMD ["serve"]
 

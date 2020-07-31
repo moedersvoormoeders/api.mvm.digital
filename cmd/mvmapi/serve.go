@@ -1,9 +1,22 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"time"
+
+	zohohttp "github.com/moedersvoormoeders/api.mvm.digital/pkg/api/zoho"
+	"github.com/moedersvoormoeders/api.mvm.digital/pkg/zoho"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -11,15 +24,32 @@ import (
 	"github.com/spf13/viper"
 )
 
+// this is used to compare to in case of no user found to keep the response time the same
+const dummyHash = `$2a$10$8KqKzq6uHCL72Qhshj9L.uGUz/0lmkjupqYQKCy6th9Rv91k53g82`
+
 func init() {
 	rootCmd.AddCommand(NewServeCmd())
 }
 
 var protectedEntryPoints = []string{"/zoho", "/v1"}
 
+type jwtClaims struct {
+	Name string `json:"name"`
+	// TODO: roles
+	jwt.StandardClaims
+}
+
 type serveCmdOptions struct {
 	BindAddr string
 	Port     int
+
+	jwtSecret []byte
+
+	db *db.Connection
+
+	zohoClientID     string
+	zohoClientSecret string
+	zohoCRM          *zoho.CRM
 }
 
 // NewServeCmd generates the `serve` command
@@ -34,20 +64,75 @@ func NewServeCmd() *cobra.Command {
 	c.Flags().StringVarP(&s.BindAddr, "bind-address", "b", "0.0.0.0", "address to bind port to")
 	c.Flags().IntVarP(&s.Port, "port", "p", 8080, "Port to listen on")
 
+	// needed for Zoho connector
+	c.Flags().StringVar(&s.zohoClientID, "zoho-clientid", "", "Zoho client ID, you can get this at https://accounts.zoho.eu/developerconsole")
+	c.Flags().StringVar(&s.zohoClientSecret, "zoho-clientsecret", "", "Zoho client Secret, you can get this at https://accounts.zoho.eu/developerconsole")
+
 	viper.BindPFlags(c.Flags())
+
+	// Bind env vars to flags
+	envs := map[string]string{
+		"MVM_ZOHO_CLIENTID":     "zoho-clientid",
+		"MVM_ZOHO_CLIENTSECRET": "zoho-clientsecret",
+	}
+
+	for env, flag := range envs {
+		flag := c.Flags().Lookup(flag)
+		flag.Usage = fmt.Sprintf("%v [env %v]", flag.Usage, env)
+		if value := os.Getenv(env); value != "" {
+			if err := flag.Value.Set(value); err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
 
 	return c
 }
 
 func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	printLogo()
+
+	if s.zohoClientID == "" {
+		fmt.Println("Zoho client ID not set, not loading Zoho integration")
+	} else {
+		s.zohoCRM = zoho.NewCRM()
+		err := s.zohoCRM.Connect(s.zohoClientID, s.zohoClientSecret)
+		if err != nil {
+			return fmt.Errorf("error connecting to Zoho: %w", err)
+		}
+
+		defer s.zohoCRM.Close()
+	}
+
+	s.db = db.NewConnection()
+	err := s.db.Open(db.ConnectionDetails{
+		Host:     "postgres",
+		Port:     5432,
+		User:     "postgres",
+		Database: "postgres",
+		Password: "moedersvoormoeders", //TODO: make flags
+	})
+	if err != nil {
+		return fmt.Errorf("error opening database: %w", err)
+	}
+
+	defer s.db.Close()
+
+	err = s.db.AutoMigrate()
+	if err != nil {
+		return fmt.Errorf("error migrating database: %w", err)
+	}
+
+	s.jwtSecret = []byte("DEVELOPMENT") // TODO: fix me
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
+	e.HideBanner = true
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: []byte("secret"),
+		SigningKey: s.jwtSecret,
+		Claims:     &jwtClaims{},
 		Skipper: func(c echo.Context) bool {
 			// always skip JWT unless path is a protectedPrefix
 			for _, protectedPrefix := range protectedEntryPoints {
@@ -59,5 +144,68 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		},
 	}))
 
-	return e.Start(fmt.Sprintf("%s:%d", s.BindAddr, s.Port))
+	// handlers
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+	e.POST("/login", s.login)
+	if s.zohoClientID != "" {
+		zohohttp.NewHTTPHandler().Register(e, s.zohoCRM)
+	}
+
+	go func() {
+		e.Start(fmt.Sprintf("%s:%d", s.BindAddr, s.Port))
+		cancel() // server ended, stop the world
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	for {
+		select {
+		case <-c:
+			cancel()
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func (s *serveCmdOptions) login(c echo.Context) error {
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+
+	if username == "" || password == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "username or password not specified"})
+	}
+
+	// TODO: check login
+	user := db.User{}
+	err := s.db.GetWhereIs(&user, "username", username)
+	if errors.Is(err, db.ErrorNotFound) {
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyHash), []byte(password))
+		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "username or password incorrect"})
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "username or password incorrect"})
+	}
+
+	// Set custom claims
+	claims := &jwtClaims{
+		user.Name,
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString(s.jwtSecret)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"token": t,
+	})
 }
