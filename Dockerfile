@@ -1,3 +1,4 @@
+ARG ARCH
 FROM golang:1.14-alpine as build
 
 COPY ./ /home/user/go/src/github.com/moedersvoormoeders/api.mvm.digital/
