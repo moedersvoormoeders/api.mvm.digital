@@ -1,8 +1,4 @@
-ARG ARCH
-FROM $ARCH/golang:1.14-alpine as build
-
-ARG QEMU_BIN
-COPY $QEMU_BIN /usr/bin
+FROM golang:1.14-alpine as build
 
 COPY ./ /home/user/go/src/github.com/moedersvoormoeders/api.mvm.digital/
 
