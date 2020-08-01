@@ -44,3 +44,4 @@ jobs:
           docker manifest push $DOCKER_PREFIX:$GITHUB_SHA
         env:
           DOCKER_PREFIX: moedersvoormoeders/api
+          DOCKER_CLI_EXPERIMENTAL: enabled
