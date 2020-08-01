@@ -10,6 +10,8 @@ RUN GOARCH=${GOARCH} GOARM=7 go build ./cmd/mvmapi
 ARG ARCH
 FROM $ARCH/alpine:3.12
 
+RUN apk add --no-cache ca-certificates
+
 COPY --from=build /home/user/go/src/github.com/moedersvoormoeders/api.mvm.digital/mvmapi /usr/local/bin/
 
 RUN mkdir /opt/mvm-api
