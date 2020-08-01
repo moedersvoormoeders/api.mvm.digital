@@ -22,7 +22,7 @@ func (h *HTTPHandler) Register(e *echo.Echo) {
 func (h *HTTPHandler) checkAuth(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*auth.Claim)
-	if claims.Name != "" {
+	if claims.Name == "" {
 		return c.JSON(http.StatusUnauthorized, echo.Map{"status": "JWT incorrect"})
 	}
 	return c.JSON(http.StatusOK, echo.Map{"status": "ok"})
