@@ -14,7 +14,7 @@ import (
 
 var (
 	defaultConfigFilename = "mvmapi"
-	envPrefix             = "MVMAPI"
+	envPrefix             = "MVM"
 
 	rootCmd = &cobra.Command{
 		Use:   "mvmapi",

@@ -19,7 +19,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/api/auth"
@@ -41,50 +40,58 @@ type serveCmdOptions struct {
 	BindAddr string
 	Port     int
 
-	jwtSecret []byte
+	jwtSecret string
 
 	db *db.Connection
 
 	zohoClientID     string
 	zohoClientSecret string
 	zohoCRM          *zoho.CRM
+
+	postgresHost     string
+	postgresPort     int
+	postgresUsername string
+	postgresDatabase string
+	postgresPassword string
 }
 
 // NewServeCmd generates the `serve` command
 func NewServeCmd() *cobra.Command {
 	s := serveCmdOptions{}
 	c := &cobra.Command{
-		Use:   "serve",
-		Short: "Serves the HTTP REST endpoint",
-		Long:  `Serves the HTTP REST endpoint on the given bind address and port`,
-		RunE:  s.RunE,
+		Use:     "serve",
+		Short:   "Serves the HTTP REST endpoint",
+		Long:    `Serves the HTTP REST endpoint on the given bind address and port`,
+		PreRunE: s.Validate,
+		RunE:    s.RunE,
 	}
 	c.Flags().StringVarP(&s.BindAddr, "bind-address", "b", "0.0.0.0", "address to bind port to")
 	c.Flags().IntVarP(&s.Port, "port", "p", 8080, "Port to listen on")
+
+	c.Flags().StringVar(&s.jwtSecret, "jwt-secret", "", "JWT siging key, please do not set in flags")
 
 	// needed for Zoho connector
 	c.Flags().StringVar(&s.zohoClientID, "zoho-clientid", "", "Zoho client ID, you can get this at https://accounts.zoho.eu/developerconsole")
 	c.Flags().StringVar(&s.zohoClientSecret, "zoho-clientsecret", "", "Zoho client Secret, you can get this at https://accounts.zoho.eu/developerconsole")
 
-	viper.BindPFlags(c.Flags())
-
-	// Bind env vars to flags
-	envs := map[string]string{
-		"MVM_ZOHO_CLIENTID":     "zoho-clientid",
-		"MVM_ZOHO_CLIENTSECRET": "zoho-clientsecret",
-	}
-
-	for env, flag := range envs {
-		flag := c.Flags().Lookup(flag)
-		flag.Usage = fmt.Sprintf("%v [env %v]", flag.Usage, env)
-		if value := os.Getenv(env); value != "" {
-			if err := flag.Value.Set(value); err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
-
+	c.Flags().StringVar(&s.postgresHost, "postgres-host", "", "PostgreSQL hostname")
+	c.Flags().IntVar(&s.postgresPort, "postgres-port", 5432, "PostgreSQL hostname")
+	c.Flags().StringVar(&s.postgresUsername, "postgres-username", "", "PostgreSQL hostname")
+	c.Flags().StringVar(&s.postgresPassword, "postgres-password", "", "PostgreSQL hostname")
+	c.Flags().StringVar(&s.postgresDatabase, "postgres-database", "", "PostgreSQL hostname")
 	return c
+}
+
+func (s *serveCmdOptions) Validate(cmd *cobra.Command, args []string) error {
+	if s.jwtSecret == "" {
+		return errors.New("jwt-secret not set")
+	}
+
+	if s.postgresUsername == "" || s.postgresPassword == "" || s.postgresDatabase == "" || s.postgresHost == "" {
+		return errors.New("PostgreSQL credentials not set")
+	}
+
+	return nil
 }
 
 func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
@@ -105,11 +112,11 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	s.db = db.NewConnection()
 	err := s.db.Open(db.ConnectionDetails{
-		Host:     "postgres",
-		Port:     5432,
-		User:     "postgres",
-		Database: "postgres",
-		Password: "moedersvoormoeders", //TODO: make flags
+		Host:     s.postgresHost,
+		Port:     s.postgresPort,
+		User:     s.postgresUsername,
+		Database: s.postgresDatabase,
+		Password: s.postgresPassword,
 	})
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
@@ -122,15 +129,13 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error migrating database: %w", err)
 	}
 
-	s.jwtSecret = []byte("DEVELOPMENT") // TODO: fix me
-
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: s.jwtSecret,
+		SigningKey: []byte(s.jwtSecret),
 		Claims:     &auth.Claim{},
 		Skipper: func(c echo.Context) bool {
 			// always skip JWT unless path is a protectedPrefix
@@ -145,7 +150,7 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	// handlers
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.String(http.StatusOK, "mvm.digital API endpoint")
 	})
 	e.POST("/login", s.login)
 	if s.zohoClientID != "" {
