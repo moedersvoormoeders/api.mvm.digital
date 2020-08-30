@@ -59,6 +59,18 @@ func (c *Connection) Add(obj interface{}) error {
 	return nil
 }
 
+func (c *Connection) GetAll(obj interface{}) error {
+	res := c.db.Find(obj)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return ErrorNotFound
+	}
+
+	return nil
+}
+
 func (c *Connection) GetID(obj interface{}, id uint) error {
 	res := c.db.First(obj, id)
 
