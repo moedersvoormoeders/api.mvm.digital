@@ -156,7 +156,7 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	if s.zohoClientID != "" {
 		zohohttp.NewHTTPHandler().Register(e, s.zohoCRM)
 	}
-	v1.NewHTTPHandler().Register(e)
+	v1.NewHTTPHandler(s.db).Register(e)
 
 	go func() {
 		e.Start(fmt.Sprintf("%s:%d", s.BindAddr, s.Port))
@@ -180,6 +180,7 @@ type AuthData struct {
 	Password string `form:"password" json:"password"`
 }
 
+// TODO: move this!
 func (s *serveCmdOptions) login(c echo.Context) error {
 	data := new(AuthData)
 	err := c.Bind(data)
@@ -215,9 +216,11 @@ func (s *serveCmdOptions) login(c echo.Context) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString(s.jwtSecret)
+	t, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
-		return err
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": err.Error(),
+		})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
