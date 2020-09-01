@@ -18,11 +18,12 @@ type MateriaalObject struct {
 	gorm.Model
 	Naam      string            `json:"naam"`
 	Categorie MateriaalCategory `json:"categorie"`
+	Hidden    bool              `json:"hidden"`
 }
 
 type Materiaal struct {
 	gorm.Model
-	MVMNummer string           `json:"mvmNummer"`
+	MVMNummer string           `json:"mvmNummer" gorm:"column:mvm_nummer"`
 	Opmerking string           `json:"opmerking"`
 	Gekregen  []MateriaalEntry `json:"gekregen"`
 }

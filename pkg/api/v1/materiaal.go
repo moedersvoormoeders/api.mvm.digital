@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -24,11 +25,11 @@ func (h *HTTPHandler) getMateriaalForKlant(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "mvmnummer not set"})
 	}
 	materiaal := db.Materiaal{}
-	err := h.db.GetWhereIs(&materiaal, "MVMNummer", mvmNummer)
+	err := h.db.GetWhereIs(&materiaal, "mvm_nummer", mvmNummer)
 
 	if err != nil && err != db.ErrorNotFound {
-		// TODO: look into how JS handles this
-		return err
+		log.Println("DB error: ", err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, materiaal)

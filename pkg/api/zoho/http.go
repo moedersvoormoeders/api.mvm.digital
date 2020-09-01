@@ -34,7 +34,7 @@ func (h *HTTPHandler) getKlantForMVMNummer(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, echo.Map{"error": "geen klant gevonden"})
 	}
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err})
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, klant)

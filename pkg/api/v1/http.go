@@ -12,11 +12,13 @@ import (
 )
 
 type HTTPHandler struct {
-	db db.Connection
+	db *db.Connection
 }
 
-func NewHTTPHandler() *HTTPHandler {
-	return &HTTPHandler{}
+func NewHTTPHandler(db *db.Connection) *HTTPHandler {
+	return &HTTPHandler{
+		db: db,
+	}
 }
 
 func (h *HTTPHandler) Register(e *echo.Echo) {

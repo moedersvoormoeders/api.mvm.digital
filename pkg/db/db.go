@@ -34,6 +34,8 @@ func (c *Connection) Open(details ConnectionDetails) error {
 		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		details.Host, details.Port, details.User, details.Database, details.Password))
 
+	c.db.LogMode(true)
+
 	return err
 }
 
@@ -42,7 +44,33 @@ func (c *Connection) Close() error {
 }
 
 func (c *Connection) AutoMigrate() error {
-	err := c.db.AutoMigrate(&User{})
+	err := c.db.AutoMigrate(
+		&User{},
+		&Materiaal{},
+		&MateriaalEntry{},
+		&MateriaalObject{},
+		&MateriaalCategory{},
+	)
+	if err != nil {
+		return err.Error
+	}
+
+	err = c.db.AutoMigrate(&Materiaal{})
+	if err != nil {
+		return err.Error
+	}
+
+	err = c.db.AutoMigrate(&MateriaalEntry{})
+	if err != nil {
+		return err.Error
+	}
+
+	err = c.db.AutoMigrate(&MateriaalObject{})
+	if err != nil {
+		return err.Error
+	}
+
+	err = c.db.AutoMigrate(&MateriaalCategory{})
 	if err != nil {
 		return err.Error
 	}
@@ -87,7 +115,7 @@ func (c *Connection) GetID(obj interface{}, id uint) error {
 func (c *Connection) GetWhereIs(obj interface{}, property string, where interface{}) error {
 	res := c.db.First(obj, fmt.Sprintf("%s = ?", property), where)
 
-	if res.Error != nil {
+	if res.Error != nil && !gorm.IsRecordNotFoundError(res.Error) {
 		return res.Error
 	}
 	if res.RowsAffected == 0 {
