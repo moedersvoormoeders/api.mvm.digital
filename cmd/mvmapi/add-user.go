@@ -18,6 +18,12 @@ type addUserCmdOptions struct {
 	Username string
 	Password string
 	Name     string
+
+	postgresHost     string
+	postgresPort     int
+	postgresUsername string
+	postgresDatabase string
+	postgresPassword string
 }
 
 // NewServeCmd generates the `serve` command
@@ -32,6 +38,12 @@ func NewAddUserCmd() *cobra.Command {
 	c.Flags().StringVarP(&a.Username, "username", "u", "", "Username for the user")
 	c.Flags().StringVarP(&a.Password, "password", "p", "", "Password for the user")
 	c.Flags().StringVarP(&a.Name, "name", "n", "", "Visible name fore the user")
+
+	c.Flags().StringVar(&a.postgresHost, "postgres-host", "", "PostgreSQL hostname")
+	c.Flags().IntVar(&a.postgresPort, "postgres-port", 5432, "PostgreSQL hostname")
+	c.Flags().StringVar(&a.postgresUsername, "postgres-username", "", "PostgreSQL hostname")
+	c.Flags().StringVar(&a.postgresPassword, "postgres-password", "", "PostgreSQL hostname")
+	c.Flags().StringVar(&a.postgresDatabase, "postgres-database", "", "PostgreSQL hostname")
 
 	viper.BindPFlags(c.Flags())
 
@@ -57,11 +69,11 @@ func (a *addUserCmdOptions) Validate(cmd *cobra.Command, args []string) error {
 func (a *addUserCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	dbConn := db.NewConnection()
 	err := dbConn.Open(db.ConnectionDetails{
-		Host:     "postgres",
-		Port:     5432,
-		User:     "postgres",
-		Database: "postgres",
-		Password: "moedersvoormoeders", //TODO: make flags
+		Host:     a.postgresHost,
+		Port:     a.postgresPort,
+		User:     a.postgresUsername,
+		Database: a.postgresDatabase,
+		Password: a.postgresPassword,
 	})
 
 	if err != nil {
