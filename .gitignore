@@ -1,3 +1,4 @@
 /mvmapi
 .idea
 api.env
+.envrc
