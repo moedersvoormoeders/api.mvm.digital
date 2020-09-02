@@ -51,8 +51,7 @@ func (a *materiaalCmdOptions) Validate(cmd *cobra.Command, args []string) error 
 func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	// TODO: make function to actually be flexible
 
-	dbConn := db.NewConnection()
-	err := dbConn.Open(db.ConnectionDetails{
+	dbConn, err := db.NewConnection(db.ConnectionDetails{
 		Host:     a.postgresHost,
 		Port:     a.postgresPort,
 		User:     a.postgresUsername,
@@ -60,12 +59,13 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		Password: a.postgresPassword,
 	})
 
+	dbConn.DoMigrate()
+
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
 	}
-	defer dbConn.Close()
 
-	toAddCategories := []interface{}{
+	toAddCategories := []db.MateriaalCategory{
 		db.MateriaalCategory{
 			Naam:    "Kleding",
 			OpMaat:  true,
@@ -93,7 +93,8 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, obj := range toAddCategories {
-		err = dbConn.Add(obj)
+		fmt.Println(obj)
+		err = dbConn.Add(&obj)
 		if err != nil {
 			return err
 		}
@@ -102,13 +103,13 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	catKleding := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catKleding, "naam", "Kleding")
 	catSpeelgoed := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catKleding, "naam", "Speelgoed")
+	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catBabymateriaal := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catKleding, "naam", "Babymateriaal")
+	dbConn.GetWhereIs(&catBabymateriaal, "naam", "Babymateriaal")
 	catVoorMoeder := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catKleding, "naam", "Voor Moeder")
+	dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
 
-	objectsToAdd := []interface{}{
+	objectsToAdd := []db.MateriaalObject{
 		db.MateriaalObject{
 			Naam:      "Pakket Zomer",
 			Categorie: catKleding,
@@ -180,7 +181,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, obj := range objectsToAdd {
-		err = dbConn.Add(obj)
+		err = dbConn.Add(&obj)
 		if err != nil {
 			return err
 		}

@@ -110,8 +110,8 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		defer s.zohoCRM.Close()
 	}
 
-	s.db = db.NewConnection()
-	err := s.db.Open(db.ConnectionDetails{
+	var err error
+	s.db, err = db.NewConnection(db.ConnectionDetails{
 		Host:     s.postgresHost,
 		Port:     s.postgresPort,
 		User:     s.postgresUsername,
@@ -122,9 +122,7 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
-	defer s.db.Close()
-
-	err = s.db.AutoMigrate()
+	err = s.db.DoMigrate()
 	if err != nil {
 		return fmt.Errorf("error migrating database: %w", err)
 	}

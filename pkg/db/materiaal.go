@@ -3,7 +3,7 @@ package db
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type MateriaalCategory struct {
@@ -16,9 +16,10 @@ type MateriaalCategory struct {
 
 type MateriaalObject struct {
 	gorm.Model
-	Naam      string            `json:"naam"`
-	Categorie MateriaalCategory `json:"categorie"`
-	Hidden    bool              `json:"hidden"`
+	Naam        string `json:"naam"`
+	CategorieID int
+	Categorie   MateriaalCategory `json:"categorie"`
+	Hidden      bool              `json:"hidden"`
 }
 
 type Materiaal struct {
@@ -30,11 +31,13 @@ type Materiaal struct {
 
 type MateriaalEntry struct {
 	gorm.Model
-	Datum     time.Time       `json:"datum"`
-	Aantal    int             `json:"aantal"`
+	Datum     time.Time `json:"datum"`
+	Aantal    int       `json:"aantal"`
+	ObjectID  int
 	Object    MateriaalObject `json:"object"`
 	Maat      string          `json:"maat"`
 	Opmerking string          `json:"opmerking"`
 	// to be deprecated once we have a copy of family members in our DB
-	Ontvanger string `json:"ontvanger"`
+	Ontvanger   string `json:"ontvanger"`
+	MateriaalID uint
 }

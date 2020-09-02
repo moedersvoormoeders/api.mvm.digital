@@ -67,8 +67,7 @@ func (a *addUserCmdOptions) Validate(cmd *cobra.Command, args []string) error {
 }
 
 func (a *addUserCmdOptions) RunE(cmd *cobra.Command, args []string) error {
-	dbConn := db.NewConnection()
-	err := dbConn.Open(db.ConnectionDetails{
+	dbConn, err := db.NewConnection(db.ConnectionDetails{
 		Host:     a.postgresHost,
 		Port:     a.postgresPort,
 		User:     a.postgresUsername,
@@ -79,7 +78,6 @@ func (a *addUserCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
 	}
-	defer dbConn.Close()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(a.Password), bcrypt.DefaultCost)
 	if err != nil {
