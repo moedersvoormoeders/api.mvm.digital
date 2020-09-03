@@ -31,9 +31,9 @@ type Materiaal struct {
 
 type MateriaalEntry struct {
 	gorm.Model
-	Datum     time.Time `json:"datum"`
-	Aantal    int       `json:"aantal"`
-	ObjectID  int
+	Datum     time.Time       `json:"datum"`
+	Aantal    int             `json:"aantal"`
+	ObjectID  int             `json:"objectId"`
 	Object    MateriaalObject `json:"object"`
 	Maat      string          `json:"maat"`
 	Opmerking string          `json:"opmerking"`

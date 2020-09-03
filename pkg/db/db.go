@@ -103,11 +103,12 @@ func (c *Connection) GetID(obj interface{}, id uint) error {
 func (c *Connection) GetWhereIs(obj interface{}, property string, where interface{}) error {
 	res := c.First(obj, fmt.Sprintf("%s = ?", property), where)
 
+	if res.RowsAffected == 0 || res.Error == gorm.ErrRecordNotFound {
+		return ErrorNotFound
+	}
+
 	if res.Error != nil {
 		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return ErrorNotFound
 	}
 
 	return nil

@@ -2,6 +2,8 @@ module github.com/moedersvoormoeders/api.mvm.digital
 
 go 1.14
 
+replace github.com/schmorrison/Zoho v0.0.0-20200726181448-707d9fdc8ca7 => github.com/meyskens/Zoho v0.0.0-20200903081837-b98904914dd2
+
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b

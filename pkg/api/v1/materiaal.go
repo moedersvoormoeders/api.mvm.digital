@@ -10,7 +10,7 @@ import (
 
 func (h *HTTPHandler) getMateriaalObjects(c echo.Context) error {
 	materiaalObjects := []db.MateriaalObject{}
-	res := h.db.Preload("Categorie").Find(&materiaalObjects, "hidden = ?", false)
+	res := h.db.Preload("Categorie").Find(&materiaalObjects)
 
 	if res.Error != nil {
 		// TODO: look into how JS handles this

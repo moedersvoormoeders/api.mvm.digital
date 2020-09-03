@@ -19,6 +19,7 @@ func (h *HTTPHandler) Register(e *echo.Echo, z *zoho.CRM) {
 	h.zohoCRM = z
 
 	e.GET("/zoho/klant/", h.getKlantForMVMNummer)
+	e.GET("/zoho/contacten/", h.getContactenForMVMNummer)
 	e.GET("/zoho/voeding/", h.getVoedingForMVMNummer)
 }
 
@@ -56,4 +57,22 @@ func (h *HTTPHandler) getVoedingForMVMNummer(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, voeding)
+}
+
+func (h *HTTPHandler) getContactenForMVMNummer(c echo.Context) error {
+	mvmNummer := c.QueryParam("mvmNummer")
+
+	if mvmNummer == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "missing mvmNummer query parameter"})
+	}
+
+	contacten, err := h.zohoCRM.GetContactenForMVMNummer(mvmNummer)
+	if err == zoho.ErrNotFound {
+		return c.JSON(http.StatusNotFound, echo.Map{"error": "geen klant gevonden"})
+	}
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err})
+	}
+
+	return c.JSON(http.StatusOK, contacten)
 }
