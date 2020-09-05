@@ -27,6 +27,7 @@ func (h *HTTPHandler) Register(e *echo.Echo) {
 	// materiaal
 	e.GET("/v1/materiaal/objects", h.getMateriaalObjects)
 	e.GET("/v1/materiaal/klant/:mvmnummer", h.getMateriaalForKlant)
+	e.POST("/v1/materiaal/klant/:mvmnummer", h.postMateriaalForKlant)
 }
 
 func (h *HTTPHandler) checkAuth(c echo.Context) error {

@@ -3,6 +3,8 @@ package db
 import (
 	"time"
 
+	"gorm.io/gorm/clause"
+
 	"gorm.io/gorm"
 )
 
@@ -40,4 +42,29 @@ type MateriaalEntry struct {
 	// to be deprecated once we have a copy of family members in our DB
 	Ontvanger   string `json:"ontvanger"`
 	MateriaalID uint
+}
+
+func (c *Connection) FillMateriaalGekregen(o *Materiaal) error {
+	if o.Gekregen == nil {
+		return nil
+	}
+
+	cache := map[int]MateriaalObject{}
+
+	for id, entry := range o.Gekregen {
+		object := MateriaalObject{}
+		if cachedObject, hasCache := cache[entry.ObjectID]; hasCache {
+			object = cachedObject
+		} else {
+			res := c.Preload(clause.Associations).Where("id = ?", entry.ObjectID).First(&object)
+			if res.Error != nil {
+				return res.Error
+			}
+			cache[entry.ObjectID] = object
+		}
+
+		o.Gekregen[id].Object = object
+	}
+
+	return nil
 }
