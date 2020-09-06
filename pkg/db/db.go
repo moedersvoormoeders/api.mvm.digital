@@ -3,15 +3,19 @@ package db
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var ErrorNotFound = errors.New("Not found")
 
 type Connection struct {
-	db *gorm.DB
+	*gorm.DB
 }
 
 type ConnectionDetails struct {
@@ -22,36 +26,47 @@ type ConnectionDetails struct {
 	Password string
 }
 
-func NewConnection() *Connection {
-	conn := Connection{}
+func NewConnection(details ConnectionDetails) (*Connection, error) {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold: time.Second, // Slow SQL threshold
+			LogLevel:      logger.Info, // Log level
+			Colorful:      false,       // Disable color
+		},
+	)
 
-	return &conn
-}
-
-func (c *Connection) Open(details ConnectionDetails) error {
 	var err error
-	c.db, err = gorm.Open("postgres", fmt.Sprintf(
+	c, err := gorm.Open(postgres.Open(fmt.Sprintf(
 		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-		details.Host, details.Port, details.User, details.Database, details.Password))
+		details.Host, details.Port, details.User, details.Database, details.Password)), &gorm.Config{
+		Logger: newLogger,
+	})
 
-	return err
+	return &Connection{c}, err
 }
 
-func (c *Connection) Close() error {
-	return c.db.Close()
-}
-
-func (c *Connection) AutoMigrate() error {
-	err := c.db.AutoMigrate(&User{})
+func (c *Connection) DoMigrate() error {
+	err := c.AutoMigrate(
+		&User{},
+		&Materiaal{},
+		&MateriaalCategory{},
+		&MateriaalEntry{},
+		&MateriaalObject{},
+	)
 	if err != nil {
-		return err.Error
+		return err
 	}
 
 	return nil
 }
 
+// deprecated
 func (c *Connection) Add(obj interface{}) error {
-	res := c.db.Create(obj)
+	if obj == nil {
+		return errors.New("object is nil")
+	}
+	res := c.Create(obj)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -59,8 +74,21 @@ func (c *Connection) Add(obj interface{}) error {
 	return nil
 }
 
+// deprecated
+func (c *Connection) GetAll(obj interface{}) error {
+	res := c.Find(obj)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return ErrorNotFound
+	}
+
+	return nil
+}
+
 func (c *Connection) GetID(obj interface{}, id uint) error {
-	res := c.db.First(obj, id)
+	res := c.First(obj, id)
 
 	if res.Error != nil {
 		return res.Error
@@ -73,8 +101,21 @@ func (c *Connection) GetID(obj interface{}, id uint) error {
 }
 
 func (c *Connection) GetWhereIs(obj interface{}, property string, where interface{}) error {
-	res := c.db.First(obj, fmt.Sprintf("%s = ?", property), where)
+	res := c.First(obj, fmt.Sprintf("%s = ?", property), where)
 
+	if res.RowsAffected == 0 || res.Error == gorm.ErrRecordNotFound {
+		return ErrorNotFound
+	}
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (c *Connection) GetAllWhereIs(obj interface{}, property string, where interface{}) error {
+	res := c.Find(obj, fmt.Sprintf("%s = ?", property), where)
 	if res.Error != nil {
 		return res.Error
 	}
