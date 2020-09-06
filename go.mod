@@ -6,6 +6,7 @@ replace github.com/schmorrison/Zoho v0.0.0-20200726181448-707d9fdc8ca7 => github
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/didip/tollbooth_echo v0.0.0-20190918161726-5adbfff23d88 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/jinzhu/gorm v1.9.15
 	github.com/labstack/echo/v4 v4.1.16

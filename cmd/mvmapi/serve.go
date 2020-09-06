@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/didip/tollbooth"
+	"github.com/didip/tollbooth_echo"
+
 	v1 "github.com/moedersvoormoeders/api.mvm.digital/pkg/api/v1"
 
 	"github.com/dgrijalva/jwt-go"
@@ -150,7 +153,12 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "mvm.digital API endpoint")
 	})
-	e.POST("/login", s.login)
+
+	// Setup login
+	limiter := tollbooth.NewLimiter(1, nil)
+	limiter.SetIPLookups([]string{"X-Forwarded-For", "RemoteAddr"})
+	e.POST("/login", s.login, tollbooth_echo.LimitHandler(limiter))
+
 	if s.zohoClientID != "" {
 		zohohttp.NewHTTPHandler().Register(e, s.zohoCRM)
 	}
