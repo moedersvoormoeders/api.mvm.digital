@@ -22,6 +22,7 @@ type MateriaalObject struct {
 	CategorieID int
 	Categorie   MateriaalCategory `json:"categorie"`
 	Hidden      bool              `json:"hidden"`
+	Prijs       float64           `json:"prijs"` // most of the times this is 0.0
 }
 
 type Materiaal struct {
