@@ -16,6 +16,12 @@ type MateriaalCategory struct {
 	Order   int    `json:"order"`
 }
 
+type MateriaalMaat struct {
+	gorm.Model
+	Naam              string `json:"naam"`
+	MateriaalObjectID uint
+}
+
 type MateriaalObject struct {
 	gorm.Model
 	Naam        string `json:"naam"`
@@ -23,6 +29,7 @@ type MateriaalObject struct {
 	Categorie   MateriaalCategory `json:"categorie"`
 	Hidden      bool              `json:"hidden"`
 	Prijs       float64           `json:"prijs"` // most of the times this is 0.0
+	Maten       []MateriaalMaat   `json:"maten"`
 }
 
 type Materiaal struct {
@@ -38,11 +45,12 @@ type MateriaalEntry struct {
 	Aantal    int             `json:"aantal"`
 	ObjectID  int             `json:"objectId"`
 	Object    MateriaalObject `json:"object"`
-	Maat      string          `json:"maat"`
+	Maat      MateriaalMaat   `json:"maat"`
 	Opmerking string          `json:"opmerking"`
 	// to be deprecated once we have a copy of family members in our DB
 	Ontvanger   string `json:"ontvanger"`
 	MateriaalID uint
+	MaatID      uint
 }
 
 func (c *Connection) FillMateriaalGekregen(o *Materiaal) error {
@@ -65,6 +73,22 @@ func (c *Connection) FillMateriaalGekregen(o *Materiaal) error {
 		}
 
 		o.Gekregen[id].Object = object
+	}
+
+	maatCache := map[uint]MateriaalMaat{}
+	for id, entry := range o.Gekregen {
+		maat := MateriaalMaat{}
+		if cachedObject, hasCache := maatCache[entry.MaatID]; hasCache {
+			maat = cachedObject
+		} else {
+			res := c.Preload(clause.Associations).Where("id = ?", entry.MaatID).First(&maat)
+			if res.Error != nil {
+				return res.Error
+			}
+			maatCache[entry.MaatID] = maat
+		}
+
+		o.Gekregen[id].Maat = maat
 	}
 
 	return nil

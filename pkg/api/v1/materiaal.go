@@ -13,7 +13,7 @@ import (
 
 func (h *HTTPHandler) getMateriaalObjects(c echo.Context) error {
 	materiaalObjects := []db.MateriaalObject{}
-	res := h.db.Preload("Categorie").Find(&materiaalObjects)
+	res := h.db.Preload(clause.Associations).Find(&materiaalObjects)
 
 	if res.Error != nil {
 		// TODO: look into how JS handles this

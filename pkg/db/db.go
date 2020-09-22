@@ -53,6 +53,7 @@ func (c *Connection) DoMigrate() error {
 		&MateriaalCategory{},
 		&MateriaalEntry{},
 		&MateriaalObject{},
+		&MateriaalMaat{},
 	)
 	if err != nil {
 		return err

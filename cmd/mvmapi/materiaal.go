@@ -61,34 +61,77 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	dbConn.DoMigrate()
 
+	badbyMaten := []db.MateriaalMaat{
+		{Naam: "prematuur"},
+		{Naam: "0 ma - 56"},
+		{Naam: "3 ma - 62"},
+		{Naam: "6 ma - 68"},
+		{Naam: "9 ma - 74"},
+		{Naam: "12 ma - 80"},
+		{Naam: "18 ma - 86"},
+	}
+
+	defaultMaten := []db.MateriaalMaat{
+		{Naam: "prematuur"},
+		{Naam: "0 ma - 56"},
+		{Naam: "3 ma - 62"},
+		{Naam: "6 ma - 68"},
+		{Naam: "9 ma - 74"},
+		{Naam: "12 ma - 80"},
+		{Naam: "18 ma - 86"},
+		{Naam: "2 jr - 92"},
+		{Naam: "3 jr - 98"},
+		{Naam: "4 jr - 104"},
+		{Naam: "5 jr - 110"},
+		{Naam: "6 jr - 116"},
+		{Naam: "7 jr - 122"},
+		{Naam: "8 jr - 128"},
+		{Naam: "9 jr - 134"},
+		{Naam: "10 jr - 140"},
+		{Naam: "11 jr - 146"},
+		{Naam: "12 jr - 152"},
+		{Naam: "14 jr - 164"},
+	}
+
+	schoenMaten := []db.MateriaalMaat{
+		{Naam: "baby"},
+		{Naam: "22"},
+		{Naam: "23"},
+		{Naam: "24"},
+		{Naam: "25"},
+		{Naam: "26"},
+		{Naam: "27"},
+		{Naam: "28"},
+		{Naam: "29"},
+		{Naam: "30"},
+		{Naam: "31"},
+		{Naam: "32"},
+		{Naam: "33"},
+		{Naam: "34"},
+		{Naam: "35"},
+		{Naam: "36"},
+		{Naam: "37"},
+		{Naam: "38"},
+		{Naam: "39"},
+		{Naam: "40"},
+		{Naam: "41"},
+		{Naam: "42"},
+		{Naam: "43"},
+		{Naam: "44"},
+		{Naam: "45"},
+		{Naam: ">45"},
+	}
+
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
 	toAddCategories := []db.MateriaalCategory{
 		db.MateriaalCategory{
-			Naam:    "Kleding",
+			Naam:    "Kinderkleding",
 			OpMaat:  true,
 			PerKind: true,
 			Order:   1,
-		},
-		db.MateriaalCategory{
-			Naam:    "Speelgoed",
-			OpMaat:  false,
-			PerKind: true,
-			Order:   2,
-		},
-		db.MateriaalCategory{
-			Naam:    "Babymateriaal",
-			OpMaat:  false,
-			PerKind: false,
-			Order:   3,
-		},
-		db.MateriaalCategory{
-			Naam:    "Voor Moeder",
-			OpMaat:  false,
-			PerKind: false,
-			Order:   4,
 		},
 	}
 
@@ -101,82 +144,89 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	}
 
 	catKleding := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catKleding, "naam", "Kleding")
-	catSpeelgoed := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
+	/*catSpeelgoed := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catBabymateriaal := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catBabymateriaal, "naam", "Babymateriaal")
 	catVoorMoeder := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
+	dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")*/
 
 	objectsToAdd := []db.MateriaalObject{
 		db.MateriaalObject{
 			Naam:      "Pakket Zomer",
 			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Pakket Winter",
 			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Pakket Lente",
+			Categorie: catKleding,
+			Maten:     copySlice(badbyMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Pakket Herfst",
+			Categorie: catKleding,
+			Maten:     copySlice(badbyMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Schoenen Zomer",
 			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Schoenen Winter",
 			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Pantoffels winter",
+			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Laarzen winter",
+			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Laarzen regen",
+			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Turnpantoffels",
+			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Uniform",
 			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
 		},
 		db.MateriaalObject{
-			Naam:      "Verjaardag",
-			Categorie: catSpeelgoed,
-		},
-		db.MateriaalObject{
-			Naam:      "Mini cadeau",
-			Categorie: catSpeelgoed,
-		},
-		db.MateriaalObject{
-			Naam:      "Carnaval",
-			Categorie: catSpeelgoed,
-		},
-		db.MateriaalObject{
-			Naam:      "Extra",
-			Categorie: catSpeelgoed,
+			Naam:      "Feestkleding",
+			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Ziekenhuispakket",
-			Categorie: catVoorMoeder,
+			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
 		},
 		db.MateriaalObject{
-			Naam:      "Kindskorf",
-			Categorie: catVoorMoeder,
+			Naam:      "Geboortepakket",
+			Categorie: catKleding,
+			Maten:     []db.MateriaalMaat{{Naam: "baby"}},
 		},
 		db.MateriaalObject{
-			Naam:      "Zwangerschapskleding",
-			Categorie: catVoorMoeder,
-		},
-		db.MateriaalObject{
-			Naam:      "Gelegenheids outfit",
-			Categorie: catVoorMoeder,
-		},
-		db.MateriaalObject{
-			Naam:      "Winterjas",
-			Categorie: catVoorMoeder,
-		},
-		db.MateriaalObject{
-			Naam:      "Schoenen",
-			Categorie: catVoorMoeder,
-		},
-		db.MateriaalObject{
-			Naam:      "Kapsalon",
-			Categorie: catVoorMoeder,
-		},
-		db.MateriaalObject{
-			Naam:      "Buggy",
-			Categorie: catBabymateriaal,
+			Naam:      "Extra",
+			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
 		},
 	}
 
@@ -188,4 +238,12 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	}
 
 	return err
+}
+
+func copySlice(in []db.MateriaalMaat) []db.MateriaalMaat {
+	out := []db.MateriaalMaat(nil)
+	for _, maat := range in {
+		out = append(out, maat)
+	}
+	return out
 }
