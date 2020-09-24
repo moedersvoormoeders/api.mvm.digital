@@ -55,6 +55,8 @@ func (h *HTTPHandler) postMateriaalForKlant(c echo.Context) error {
 		log.Println("Body parse error", err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
+	h.db.CleanMateriaalGekregen(&materiaal)
 	materiaal.MVMNummer = mvmNummer
 
 	materiaalFromDB := db.Materiaal{}

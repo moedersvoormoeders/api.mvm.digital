@@ -53,6 +53,20 @@ type MateriaalEntry struct {
 	MaatID      uint
 }
 
+// CleanMateriaalGekregen cleans out too deep references not to trigger UPDATE on these fields
+func (c *Connection) CleanMateriaalGekregen(o *Materiaal) {
+	for i := range o.Gekregen {
+		if o.Gekregen[i].Maat.ID > 0 {
+			o.Gekregen[i].MaatID = o.Gekregen[i].Maat.ID
+			o.Gekregen[i].Maat = MateriaalMaat{}
+		}
+		if o.Gekregen[i].Object.ID > 0 {
+			o.Gekregen[i].ObjectID = int(o.Gekregen[i].Object.ID)
+			o.Gekregen[i].Object = MateriaalObject{}
+		}
+	}
+}
+
 func (c *Connection) FillMateriaalGekregen(o *Materiaal) error {
 	if o.Gekregen == nil {
 		return nil
