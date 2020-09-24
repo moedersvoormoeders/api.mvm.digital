@@ -214,11 +214,6 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 			Maten:     copySlice(defaultMaten),
 		},
 		db.MateriaalObject{
-			Naam:      "Ziekenhuispakket",
-			Categorie: catKleding,
-			Maten:     copySlice(defaultMaten),
-		},
-		db.MateriaalObject{
 			Naam:      "Geboortepakket",
 			Categorie: catKleding,
 			Maten:     []db.MateriaalMaat{{Naam: "baby"}},
