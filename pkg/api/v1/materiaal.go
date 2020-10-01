@@ -66,7 +66,10 @@ func (h *HTTPHandler) postMateriaalForKlant(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	} else if err == db.ErrorNotFound {
 		h.db.Create(&materiaal)
-		return c.JSON(http.StatusOK, echo.Map{"status": "ok", "message": "Materiaal is opgeslagen"})
+		err = h.db.GetWhereIs(&materiaalFromDB, "mvm_nummer", mvmNummer)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	materiaal.Model = materiaalFromDB.Model
