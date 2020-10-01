@@ -2,7 +2,10 @@ package zoho
 
 import (
 	"fmt"
+	"strings"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 
 	zoho "github.com/schmorrison/Zoho"
 	"github.com/schmorrison/Zoho/crm"
@@ -102,6 +105,11 @@ func (c *CRM) GetContactenForMVMNummer(mvmNummer string) ([]Contact, error) {
 	})
 
 	if err != nil {
+		// no contacts error
+		if strings.Contains(err.Error(), "There is no content available for the request") {
+			return []Contact(nil), nil
+		}
+		spew.Dump(err)
 		return nil, err
 	}
 
