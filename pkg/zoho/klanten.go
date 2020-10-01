@@ -48,7 +48,7 @@ type zohoKlant struct {
 		Datum1EInschrijving string      `json:"Datum_1e_inschrijving"`
 		Geslacht            string      `json:"Geslacht"`
 		MaandelijkseKosten  interface{} `json:"Maandelijkse_kosten"`
-		Kindergeld          int         `json:"Kindergeld"`
+		Kindergeld          float64     `json:"Kindergeld"`
 		Approval            struct {
 			Delegate bool `json:"delegate"`
 			Approve  bool `json:"approve"`
@@ -59,7 +59,7 @@ type zohoKlant struct {
 		CreatedTime               time.Time   `json:"Created_Time"`
 		DatumHerinschrijving      interface{} `json:"Datum_herinschrijving"`
 		Nationaliteit1            []string    `json:"Nationaliteit1"`
-		Huur                      interface{} `json:"Huur"`
+		Huur                      float64     `json:"Huur"`
 		Editable                  bool        `json:"$editable"`
 		Postcode                  string      `json:"Postcode"`
 		Code                      string      `json:"Code"`
@@ -69,9 +69,9 @@ type zohoKlant struct {
 		Instantie                 string      `json:"Instantie"`
 		Aantal151                 int         `json:"Aantal_151"`
 		Status                    string      `json:"$status"`
-		Schulden                  int         `json:"Schulden"`
+		Schulden                  float64     `json:"Schulden"`
 		Description               string      `json:"Description"`
-		BeschBudgetbeheer         int         `json:"Besch_budgetbeheer"`
+		BeschBudgetbeheer         float64     `json:"Besch_budgetbeheer"`
 		PhotoID                   interface{} `json:"$photo_id"`
 		Voornaam                  string      `json:"Voornaam"`
 		Rating                    string      `json:"Rating"`
@@ -95,8 +95,8 @@ type zohoKlant struct {
 		RedenControle               string        `json:"Reden_Controle"`
 		Armoedefactor               float64       `json:"Armoedefactor"`
 		Phone                       string        `json:"Phone"`
-		MaandelijksInkomen          int           `json:"Maandelijks_inkomen"`
-		ControleArmoededrempel      int           `json:"Controle_armoededrempel"`
+		MaandelijksInkomen          float64       `json:"Maandelijks_inkomen"`
+		ControleArmoededrempel      float64       `json:"Controle_armoededrempel"`
 		AccountName                 string        `json:"Account_Name"`
 		OverigeInformatie           interface{}   `json:"Overige_informatie"`
 		ModifiedTime                time.Time     `json:"Modified_Time"`
@@ -109,7 +109,7 @@ type zohoKlant struct {
 		Aantal121                   int           `json:"Aantal_121"`
 		GasElectriciteit            interface{}   `json:"Gas_Electriciteit"`
 		Rijksregisternummer         string        `json:"Rijksregisternummer"`
-		SILC                        int           `json:"SILC"`
+		SILC                        float64       `json:"SILC"`
 		Dag                         string        `json:"Dag"`
 		Akkoordverklaring           bool          `json:"Akkoordverklaring"`
 		DoelgroepVestiging          string        `json:"Doelgroep_Vestiging"`
