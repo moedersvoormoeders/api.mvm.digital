@@ -3,6 +3,7 @@ package v1
 import (
 	"log"
 	"net/http"
+	"sort"
 
 	"gorm.io/gorm/clause"
 
@@ -40,6 +41,11 @@ func (h *HTTPHandler) getMateriaalForKlant(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, res.Error.Error())
 	}
+
+	// sort by Go till i figure out how to do it in Gorm
+	sort.Slice(materiaal.Gekregen, func(i, j int) bool {
+		return materiaal.Gekregen[i].Datum.Unix() > materiaal.Gekregen[j].Datum.Unix()
+	})
 
 	return c.JSON(http.StatusOK, materiaal)
 }
