@@ -3,6 +3,8 @@ package zoho
 import (
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+
 	zoho "github.com/schmorrison/Zoho"
 	"github.com/schmorrison/Zoho/crm"
 )
@@ -137,6 +139,8 @@ func (c *CRM) GetKlantForMVMNummer(mvmNummer string) (Klant, error) {
 		"word":     zoho.Parameter(mvmNummer),
 		"per_page": "200",
 	})
+
+	spew.Dump(out)
 
 	if err != nil {
 		return Klant{}, err
