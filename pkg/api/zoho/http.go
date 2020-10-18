@@ -1,7 +1,6 @@
 package zoho
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -33,7 +32,6 @@ func (h *HTTPHandler) getKlantForMVMNummer(c echo.Context) error {
 
 	klant, err := h.zohoCRM.GetKlantForMVMNummer(mvmNummer)
 	if err == zoho.ErrNotFound {
-		log.Println(err)
 		return c.JSON(http.StatusNotFound, echo.Map{"error": "geen klant gevonden"})
 	}
 	if err != nil {
