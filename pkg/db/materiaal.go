@@ -49,16 +49,18 @@ type MateriaalEntry struct {
 	Opmerking string          `json:"opmerking"`
 	// to be deprecated once we have a copy of family members in our DB
 	Ontvanger   string `json:"ontvanger"`
-	MateriaalID uint
-	MaatID      uint
+	MateriaalID *uint
+	MaatID      *uint
 }
 
 // CleanMateriaalGekregen cleans out too deep references not to trigger UPDATE on these fields
 func (c *Connection) CleanMateriaalGekregen(o *Materiaal) {
 	for i := range o.Gekregen {
 		if o.Gekregen[i].Maat.ID > 0 {
-			o.Gekregen[i].MaatID = o.Gekregen[i].Maat.ID
+			o.Gekregen[i].MaatID = &o.Gekregen[i].Maat.ID
 			o.Gekregen[i].Maat = MateriaalMaat{}
+		} else {
+			o.Gekregen[i].MaatID = nil
 		}
 		if o.Gekregen[i].Object.ID > 0 {
 			o.Gekregen[i].ObjectID = int(o.Gekregen[i].Object.ID)
@@ -91,15 +93,18 @@ func (c *Connection) FillMateriaalGekregen(o *Materiaal) error {
 
 	maatCache := map[uint]MateriaalMaat{}
 	for id, entry := range o.Gekregen {
+		if entry.MaatID == nil {
+			continue
+		}
 		maat := MateriaalMaat{}
-		if cachedObject, hasCache := maatCache[entry.MaatID]; hasCache {
+		if cachedObject, hasCache := maatCache[*entry.MaatID]; hasCache {
 			maat = cachedObject
 		} else {
 			res := c.Preload(clause.Associations).Where("id = ?", entry.MaatID).First(&maat)
 			if res.Error != nil {
 				return res.Error
 			}
-			maatCache[entry.MaatID] = maat
+			maatCache[*entry.MaatID] = maat
 		}
 
 		o.Gekregen[id].Maat = maat
