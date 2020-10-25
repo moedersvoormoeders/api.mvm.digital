@@ -81,7 +81,7 @@ func (h *HTTPHandler) postMateriaalForKlant(c echo.Context) error {
 	materiaal.Model = materiaalFromDB.Model
 	res := h.db.Updates(&materiaal)
 	if res.Error != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, res.Error.Error())
 	}
 
 	err = h.db.Model(&materiaal).Association("Gekregen").Replace(&materiaal.Gekregen)
