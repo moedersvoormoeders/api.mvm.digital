@@ -92,7 +92,7 @@ func (h *HTTPHandler) postMateriaalForKlant(c echo.Context) error {
 	for _, mat := range materiaal.Gekregen {
 		res := h.db.Updates(&mat)
 		if res.Error != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
+			return c.JSON(http.StatusInternalServerError, res.Error.Error())
 		}
 	}
 
