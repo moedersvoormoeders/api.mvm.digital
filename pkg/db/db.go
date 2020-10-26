@@ -40,13 +40,16 @@ func NewConnection(details ConnectionDetails) (*Connection, error) {
 	c, err := gorm.Open(postgres.Open(fmt.Sprintf(
 		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		details.Host, details.Port, details.User, details.Database, details.Password)), &gorm.Config{
-		Logger: newLogger,
+		Logger:                                   newLogger,
+		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 
 	return &Connection{c}, err
 }
 
 func (c *Connection) DoMigrate() error {
+	c.Migrator().DropConstraint(&MateriaalEntry{}, "fk_materiaal_entries_maat")
+
 	err := c.AutoMigrate(
 		&User{},
 		&Materiaal{},
