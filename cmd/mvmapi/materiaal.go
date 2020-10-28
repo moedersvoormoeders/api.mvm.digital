@@ -61,6 +61,32 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	dbConn.DoMigrate()
 
+	geenMaten := []db.MateriaalMaat{
+		{Naam: "<geen>"},
+	}
+
+	kleningMaten := []db.MateriaalMaat{
+		{Naam: "<geen>"},
+		{Naam: "XS"},
+		{Naam: "S"},
+		{Naam: "M"},
+		{Naam: "L"},
+		{Naam: "XL"},
+		{Naam: "XXL"},
+	}
+
+	schoenMaten := []db.MateriaalMaat{
+		{Naam: "<geen>"},
+		{Naam: "35"},
+		{Naam: "36"},
+		{Naam: "37"},
+		{Naam: "38"},
+		{Naam: "39"},
+		{Naam: "40"},
+		{Naam: "41"},
+		{Naam: "42"},
+	}
+
 	/*badbyMaten := []db.MateriaalMaat{
 		{Naam: "prematuur"},
 		{Naam: "0 ma - 56"},
@@ -129,7 +155,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	toAddCategories := []db.MateriaalCategory{
 		db.MateriaalCategory{
 			Naam:    "Voor Moeder",
-			OpMaat:  false,
+			OpMaat:  true,
 			PerKind: false,
 			Order:   2,
 		},
@@ -156,38 +182,47 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		db.MateriaalObject{
 			Naam:      "Winterjas",
 			Categorie: catVoorMoeder,
+			Maten:     kleningMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Sjaal -muts",
 			Categorie: catVoorMoeder,
+			Maten:     geenMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Schoenen winter",
 			Categorie: catVoorMoeder,
+			Maten:     schoenMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Schoenen zomer",
 			Categorie: catVoorMoeder,
+			Maten:     schoenMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Make-over voorjaar",
 			Categorie: catVoorMoeder,
+			Maten:     geenMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Make-over najaar",
 			Categorie: catVoorMoeder,
+			Maten:     geenMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Zwangerschapskleding",
 			Categorie: catVoorMoeder,
+			Maten:     kleningMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Ziekenhuispakket mama",
 			Categorie: catVoorMoeder,
+			Maten:     geenMaten,
 		},
 		db.MateriaalObject{
 			Naam:      "Kapper",
 			Categorie: catVoorMoeder,
+			Maten:     geenMaten,
 		},
 	}
 
