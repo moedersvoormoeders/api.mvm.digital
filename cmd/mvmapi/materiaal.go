@@ -182,47 +182,47 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		db.MateriaalObject{
 			Naam:      "Winterjas",
 			Categorie: catVoorMoeder,
-			Maten:     kleningMaten,
+			Maten:     copySlice(kleningMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Sjaal -muts",
 			Categorie: catVoorMoeder,
-			Maten:     geenMaten,
+			Maten:     copySlice(geenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Schoenen winter",
 			Categorie: catVoorMoeder,
-			Maten:     schoenMaten,
+			Maten:     copySlice(schoenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Schoenen zomer",
 			Categorie: catVoorMoeder,
-			Maten:     schoenMaten,
+			Maten:     copySlice(schoenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Make-over voorjaar",
 			Categorie: catVoorMoeder,
-			Maten:     geenMaten,
+			Maten:     copySlice(geenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Make-over najaar",
 			Categorie: catVoorMoeder,
-			Maten:     geenMaten,
+			Maten:     copySlice(geenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Zwangerschapskleding",
 			Categorie: catVoorMoeder,
-			Maten:     kleningMaten,
+			Maten:     copySlice(kleningMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Ziekenhuispakket mama",
 			Categorie: catVoorMoeder,
-			Maten:     geenMaten,
+			Maten:     copySlice(geenMaten),
 		},
 		db.MateriaalObject{
 			Naam:      "Kapper",
 			Categorie: catVoorMoeder,
-			Maten:     geenMaten,
+			Maten:     copySlice(geenMaten),
 		},
 	}
 
