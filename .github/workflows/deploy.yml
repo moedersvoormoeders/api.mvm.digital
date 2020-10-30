@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  jekyll_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source branch for building Pages
+        uses: actions/checkout@v2
+        with:
+          repository: "https://github.com/moedersvoormoeders/infrastructure.git"
+          path: "infrastructure"
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "mvm-bot@mect.io"
+          git config --local user.name "mvm-bot"
+          cd infrastructure
+          git checkout -b deploy-$GITHUB_SHA
+          mkdir imagetags || true
+          echo "$GITHUB_SHA" >imagetags/api-sha
+          git add .
+          git commit -m "Deploy $GITHUB_SHA"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: deploy-${{ env.GITHUB_SHA }}
+
+      - name: Initialize Pull Request
+        uses: gha-utilities/init-pull-request@v0.2.0
+        env:
+          GITHUB_REPOSITORY: moedersvoormoeders/infrastructure
+        with:
+          verbose: true
+          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
+          head: deploy-${{ env.GITHUB_SHA }}
+          base: main
+          title: "Deploy API ${{ env.GITHUB_SHA }}"
+          body: >
+            Deploys ${{ env.GITHUB_SHA }} of api.mvm.digital
