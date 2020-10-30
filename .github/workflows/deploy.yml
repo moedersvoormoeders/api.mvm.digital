@@ -32,7 +32,7 @@ jobs:
           branch: deploy-${{ env.GITHUB_SHA }}
 
       - name: Initialize Pull Request
-        uses: gha-utilities/init-pull-request@v0.2.0
+        uses: gha-utilities/init-pull-request@v0.1.9
         env:
           GITHUB_REPOSITORY: moedersvoormoeders/infrastructure
         with:
