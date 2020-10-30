@@ -5,9 +5,8 @@ on:
     branches: [ main ]
 
 jobs:
-  jekyll_build:
+  pr_to_infra:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout source branch for building Pages
         uses: actions/checkout@v2
