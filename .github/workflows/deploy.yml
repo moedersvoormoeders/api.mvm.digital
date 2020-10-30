@@ -8,10 +8,10 @@ jobs:
   pr_to_infra:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source branch for building Pages
+      - name: Checkout infrastructure
         uses: actions/checkout@v2
         with:
-          repository: "https://github.com/moedersvoormoeders/infrastructure.git"
+          repository: "moedersvoormoeders/infrastructure"
           path: "infrastructure"
 
       - name: Commit changes
