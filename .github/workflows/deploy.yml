@@ -11,12 +11,13 @@ jobs:
       - name: Checkout infrastructure
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.BOT_TOKEN }} 
           repository: "moedersvoormoeders/infrastructure"
           path: "infrastructure"
 
       - name: Commit changes
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.BOT_TOKEN}}
         run: |
           git config --local user.email "mvm-bot@mect.io"
           git config --local user.name "mvm-bot"
