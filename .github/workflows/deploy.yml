@@ -19,9 +19,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.BOT_TOKEN}}
         run: |
+          cd infrastructure
           git config --local user.email "mvm-bot@mect.io"
           git config --local user.name "mvm-bot"
-          cd infrastructure
           git checkout -b deploy-$GITHUB_SHA
           mkdir imagetags || true
           echo "$GITHUB_SHA" >imagetags/api-sha
