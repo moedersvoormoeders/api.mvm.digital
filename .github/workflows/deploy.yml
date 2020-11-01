@@ -27,5 +27,5 @@ jobs:
           echo "$GITHUB_SHA" >imagetags/api-sha
           git add .
           git commit -m "Deploy $GITHUB_SHA"
-          git push
+          git push --set-upstream origin deploy-$GITHUB_SHA
           gh pr create --title "Deploy API $GITHUB_SHA" --body "Deploy $GITHUB_SHA of api.mvm.digital" --repo github.com/moedersvoormoeders/infrastructure
