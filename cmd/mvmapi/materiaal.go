@@ -61,7 +61,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	dbConn.DoMigrate()
 
-	geenMaten := []db.MateriaalMaat{
+	/*geenMaten := []db.MateriaalMaat{
 		{Naam: "<geen>"},
 	}
 
@@ -86,16 +86,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "41"},
 		{Naam: "42"},
 	}
-
-	/*badbyMaten := []db.MateriaalMaat{
-		{Naam: "prematuur"},
-		{Naam: "0 ma - 56"},
-		{Naam: "3 ma - 62"},
-		{Naam: "6 ma - 68"},
-		{Naam: "9 ma - 74"},
-		{Naam: "12 ma - 80"},
-		{Naam: "18 ma - 86"},
-	}
+	*/
 
 	defaultMaten := []db.MateriaalMaat{
 		{Naam: "prematuur"},
@@ -117,6 +108,16 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "11 jr - 146"},
 		{Naam: "12 jr - 152"},
 		{Naam: "14 jr - 164"},
+	}
+
+	/*badbyMaten := []db.MateriaalMaat{
+		{Naam: "prematuur"},
+		{Naam: "0 ma - 56"},
+		{Naam: "3 ma - 62"},
+		{Naam: "6 ma - 68"},
+		{Naam: "9 ma - 74"},
+		{Naam: "12 ma - 80"},
+		{Naam: "18 ma - 86"},
 	}
 
 	schoenMaten := []db.MateriaalMaat{
@@ -152,14 +153,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
-	toAddCategories := []db.MateriaalCategory{
-		db.MateriaalCategory{
-			Naam:    "Voor Moeder",
-			OpMaat:  true,
-			PerKind: false,
-			Order:   2,
-		},
-	}
+	toAddCategories := []db.MateriaalCategory{}
 
 	for _, obj := range toAddCategories {
 		fmt.Println(obj)
@@ -169,60 +163,20 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	//catKleding := db.MateriaalCategory{}
-	//dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
+	catKleding := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
 	/*catSpeelgoed := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catBabymateriaal := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catBabymateriaal, "naam", "Babymateriaal")*/
-	catVoorMoeder := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
+	//catVoorMoeder := db.MateriaalCategory{}
+	//dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
 
 	objectsToAdd := []db.MateriaalObject{
 		db.MateriaalObject{
-			Naam:      "Winterjas",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(kleningMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Sjaal -muts",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(geenMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Schoenen winter",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(schoenMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Schoenen zomer",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(schoenMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Make-over voorjaar",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(geenMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Make-over najaar",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(geenMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Zwangerschapskleding",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(kleningMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Ziekenhuispakket mama",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(geenMaten),
-		},
-		db.MateriaalObject{
-			Naam:      "Kapper",
-			Categorie: catVoorMoeder,
-			Maten:     copySlice(geenMaten),
+			Naam:      "Ziekenhuispakket",
+			Categorie: catKleding,
+			Maten:     copySlice(defaultMaten),
 		},
 	}
 
@@ -231,6 +185,30 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	objectsToAddMaat := []string{
+		"Pakket Zomer",
+		"Pakket Winter",
+		"Pakket Lente",
+		"Pakket Herfst",
+		"Schoenen Zomer",
+		"Schoenen Winter",
+		"Pantoffels winter",
+		"Laarzen winter",
+		"Laarzen regen",
+		"Turnpantoffels",
+		"Uniform",
+		"Feestkleding",
+		"Extra",
+	}
+	for _, objName := range objectsToAddMaat {
+		object := db.MateriaalObject{}
+		dbConn.GetWhereIs(&object, "naam", objName)
+		dbConn.Add(&db.MateriaalMaat{
+			Naam:              "<onbekend>",
+			MateriaalObjectID: object.ID,
+		})
 	}
 
 	return err
