@@ -89,6 +89,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	*/
 
 	defaultMaten := []db.MateriaalMaat{
+		{Naam: "baby"},
 		{Naam: "prematuur"},
 		{Naam: "0 ma - 56"},
 		{Naam: "3 ma - 62"},
