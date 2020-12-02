@@ -88,7 +88,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	}
 	*/
 
-	defaultMaten := []db.MateriaalMaat{
+	/*defaultMaten := []db.MateriaalMaat{
 		{Naam: "baby"},
 		{Naam: "prematuur"},
 		{Naam: "0 ma - 56"},
@@ -109,7 +109,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "11 jr - 146"},
 		{Naam: "12 jr - 152"},
 		{Naam: "14 jr - 164"},
-	}
+	}*/
 
 	/*badbyMaten := []db.MateriaalMaat{
 		{Naam: "prematuur"},
@@ -154,7 +154,14 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
-	toAddCategories := []db.MateriaalCategory{}
+	toAddCategories := []db.MateriaalCategory{
+		{
+			Naam:    "Speelgoed",
+			PerKind: true,
+			OpMaat:  false,
+			Order:   3,
+		},
+	}
 
 	for _, obj := range toAddCategories {
 		fmt.Println(obj)
@@ -164,20 +171,21 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	catKleding := db.MateriaalCategory{}
-	dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
+	//catKleding := db.MateriaalCategory{}
+	//dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
 	/*catSpeelgoed := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catBabymateriaal := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catBabymateriaal, "naam", "Babymateriaal")*/
 	//catVoorMoeder := db.MateriaalCategory{}
 	//dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
+	catSpeelgoed := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 
 	objectsToAdd := []db.MateriaalObject{
 		db.MateriaalObject{
-			Naam:      "Ziekenhuispakket",
-			Categorie: catKleding,
-			Maten:     copySlice(defaultMaten),
+			Naam:      "Sinterklaas",
+			Categorie: catSpeelgoed,
 		},
 	}
 
@@ -188,7 +196,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	objectsToAddMaat := []string{
+	/*objectsToAddMaat := []string{
 		"Pakket Zomer",
 		"Pakket Winter",
 		"Pakket Lente",
@@ -210,7 +218,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 			Naam:              "<onbekend>",
 			MateriaalObjectID: object.ID,
 		})
-	}
+	}*/
 
 	return err
 }
