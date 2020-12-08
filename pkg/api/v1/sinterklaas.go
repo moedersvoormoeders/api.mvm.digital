@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"gorm.io/gorm/clause"
+
 	"github.com/labstack/echo/v4"
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
 )
@@ -26,11 +28,11 @@ func (h *HTTPHandler) postSinterklaasForKlant(c echo.Context) error {
 	}
 
 	materiaalFromDB := db.Materiaal{}
-	err = h.db.GetWhereIs(&materiaalFromDB, "mvm_nummer", mvmNummer)
-	if err != nil && err != db.ErrorNotFound {
+	res := h.db.Preload(clause.Associations).Where(&db.Materiaal{MVMNummer: mvmNummer}).First(&materiaalFromDB)
+	if res.Error != nil {
 		log.Println("DB error: ", err)
 		return c.JSON(http.StatusInternalServerError, err.Error())
-	} else if err == db.ErrorNotFound {
+	} else if res.RowsAffected == 0 {
 		h.db.Create(&db.Materiaal{
 			MVMNummer: mvmNummer,
 		})
@@ -59,7 +61,7 @@ func (h *HTTPHandler) postSinterklaasForKlant(c echo.Context) error {
 		})
 	}
 
-	res := h.db.Updates(&materiaalFromDB)
+	res = h.db.Updates(&materiaalFromDB)
 	if res.Error != nil {
 		return c.JSON(http.StatusInternalServerError, res.Error.Error())
 	}
