@@ -120,9 +120,10 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "12 ma - 80"},
 		{Naam: "18 ma - 86"},
 	}
+	*/
 
 	schoenMaten := []db.MateriaalMaat{
-		{Naam: "baby"},
+		//{Naam: "baby"},
 		{Naam: "22"},
 		{Naam: "23"},
 		{Naam: "24"},
@@ -148,13 +149,14 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "44"},
 		{Naam: "45"},
 		{Naam: ">45"},
-	}*/
+		{Naam: "<onbekend>"},
+	}
 
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
-	toAddCategories := []db.MateriaalCategory{
+	/*toAddCategories := []db.MateriaalCategory{
 		{
 			Naam:    "Speelgoed",
 			PerKind: true,
@@ -169,10 +171,10 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-	}
+	}*/
 
-	//catKleding := db.MateriaalCategory{}
-	//dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
+	catKleding := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
 	/*catSpeelgoed := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catBabymateriaal := db.MateriaalCategory{}
@@ -184,8 +186,13 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	objectsToAdd := []db.MateriaalObject{
 		db.MateriaalObject{
-			Naam:      "Sinterklaas",
+			Naam:      "Verjaardag",
 			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Voetbalschoenen",
+			Categorie: catKleding,
+			Maten:     copySlice(schoenMaten),
 		},
 	}
 
