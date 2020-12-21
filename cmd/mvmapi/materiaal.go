@@ -61,36 +61,36 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 
 	dbConn.DoMigrate()
 
-	/*geenMaten := []db.MateriaalMaat{
+	geenMaten := []db.MateriaalMaat{
 		{Naam: "<geen>"},
 	}
+	/*
+		kleningMaten := []db.MateriaalMaat{
+			{Naam: "<geen>"},
+			{Naam: "XS"},
+			{Naam: "S"},
+			{Naam: "M"},
+			{Naam: "L"},
+			{Naam: "XL"},
+			{Naam: "XXL"},
+		}
 
-	kleningMaten := []db.MateriaalMaat{
-		{Naam: "<geen>"},
-		{Naam: "XS"},
-		{Naam: "S"},
-		{Naam: "M"},
-		{Naam: "L"},
-		{Naam: "XL"},
-		{Naam: "XXL"},
-	}
-
-	schoenMaten := []db.MateriaalMaat{
-		{Naam: "<geen>"},
-		{Naam: "35"},
-		{Naam: "36"},
-		{Naam: "37"},
-		{Naam: "38"},
-		{Naam: "39"},
-		{Naam: "40"},
-		{Naam: "41"},
-		{Naam: "42"},
-	}
+		schoenMaten := []db.MateriaalMaat{
+			{Naam: "<geen>"},
+			{Naam: "35"},
+			{Naam: "36"},
+			{Naam: "37"},
+			{Naam: "38"},
+			{Naam: "39"},
+			{Naam: "40"},
+			{Naam: "41"},
+			{Naam: "42"},
+		}
 	*/
 
-	/*defaultMaten := []db.MateriaalMaat{
-		{Naam: "baby"},
-		{Naam: "prematuur"},
+	defaultMaten := []db.MateriaalMaat{
+		//{Naam: "baby"},
+		//{Naam: "prematuur"},
 		{Naam: "0 ma - 56"},
 		{Naam: "3 ma - 62"},
 		{Naam: "6 ma - 68"},
@@ -109,7 +109,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "11 jr - 146"},
 		{Naam: "12 jr - 152"},
 		{Naam: "14 jr - 164"},
-	}*/
+	}
 
 	/*badbyMaten := []db.MateriaalMaat{
 		{Naam: "prematuur"},
@@ -152,16 +152,48 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		{Naam: "<onbekend>"},
 	}
 
+	schoolMaten := []db.MateriaalMaat{
+		{Naam: "1ste Kleuterklas"},
+		{Naam: "2de Kleuterklas"},
+		{Naam: "3de Kleuterklas"},
+		{Naam: "1ste Leerjaar"},
+		{Naam: "2de Leerjaar"},
+		{Naam: "3de Leerjaar"},
+		{Naam: "4de Leerjaar"},
+		{Naam: "5de Leerjaar"},
+		{Naam: "6de Leerjaar"},
+		{Naam: "1ste Middelbaar"},
+		{Naam: "<onbekend>"},
+	}
+
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
-	/*toAddCategories := []db.MateriaalCategory{
+	toAddCategories := []db.MateriaalCategory{
 		{
-			Naam:    "Speelgoed",
-			PerKind: true,
+			Naam:    "Groot Babymateriaal",
+			PerKind: false,
 			OpMaat:  false,
-			Order:   3,
+			Order:   5,
+		},
+		{
+			Naam:    "Klein Babymateriaal",
+			PerKind: false,
+			OpMaat:  false,
+			Order:   6,
+		},
+		{
+			Naam:    "Naaikamer",
+			PerKind: false,
+			OpMaat:  false,
+			Order:   7,
+		},
+		{
+			Naam:    "Schoolgerief",
+			PerKind: true,
+			OpMaat:  true,
+			Order:   8,
 		},
 	}
 
@@ -171,7 +203,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-	}*/
+	}
 
 	catKleding := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catKleding, "naam", "Kinderkleding")
@@ -183,6 +215,14 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	//dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
 	catSpeelgoed := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
+	catNaaikamer := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catNaaikamer, "naam", "Naaikamer")
+	catSchoolGerief := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catSchoolGerief, "naam", "Schoolgerief")
+	catGrootBabymateriaal := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catGrootBabymateriaal, "naam", "Groot Babymateriaal")
+	catKleinBabymateriaal := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catKleinBabymateriaal, "naam", "Klein Babymateriaal")
 
 	objectsToAdd := []db.MateriaalObject{
 		db.MateriaalObject{
@@ -190,9 +230,164 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 			Categorie: catSpeelgoed,
 		},
 		db.MateriaalObject{
+			Naam:      "Verkleedkleding",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Mini Geschenkjes",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Kinderfiets",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Kleuterfiets",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Kleuterfiets",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Fietshelm",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Extra",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Extra",
+			Categorie: catSpeelgoed,
+		},
+		db.MateriaalObject{
+			Naam:      "Gordijnen",
+			Categorie: catNaaikamer,
+		},
+		db.MateriaalObject{
+			Naam:      "Overgordijnen",
+			Categorie: catNaaikamer,
+		},
+		db.MateriaalObject{
+			Naam:      "Extra",
+			Categorie: catNaaikamer,
+		},
+		db.MateriaalObject{
+			Naam:      "Extra",
+			Categorie: catNaaikamer,
+		},
+		db.MateriaalObject{
+			Naam:      "Extra",
+			Categorie: catNaaikamer,
+		},
+		db.MateriaalObject{
+			Naam:      "Sportkleding",
+			Categorie: catSchoolGerief,
+			Maten:     copySlice(defaultMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Gevulde boekentas",
+			Categorie: catSchoolGerief,
+			Maten:     copySlice(schoolMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Pakket schoolgerief",
+			Categorie: catSchoolGerief,
+			Maten: []db.MateriaalMaat{
+				{Naam: "Middelbaar"},
+				{Naam: "Volwassenonderwijs"},
+			},
+		},
+		db.MateriaalObject{
+			Naam:      "Turnzak",
+			Categorie: catSchoolGerief,
+			Maten:     copySlice(geenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Extra",
+			Categorie: catSchoolGerief,
+			Maten:     copySlice(geenMaten),
+		},
+		db.MateriaalObject{
 			Naam:      "Voetbalschoenen",
 			Categorie: catKleding,
 			Maten:     copySlice(schoenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Afkolfapparaat",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Autostoel",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Auto verhoogkussen",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Babycook",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Buggy dubbel",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Buggy enkel",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Fietsstoel",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Kinderbed",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Kinderstoel",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Kinderwagen",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Maxi Cosi",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Park",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Reisbed",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Relax",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
+		},
+		db.MateriaalObject{
+			Naam:      "Wieg",
+			Categorie: catGrootBabymateriaal,
+			Prijs:     0.5,
 		},
 	}
 
@@ -203,29 +398,52 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	/*objectsToAddMaat := []string{
-		"Pakket Zomer",
-		"Pakket Winter",
-		"Pakket Lente",
-		"Pakket Herfst",
-		"Schoenen Zomer",
-		"Schoenen Winter",
-		"Pantoffels winter",
-		"Laarzen winter",
-		"Laarzen regen",
-		"Turnpantoffels",
-		"Uniform",
-		"Feestkleding",
-		"Extra",
+	objectsToAddBulk := []string{
+		"Babyfoon",
+		"Badje",
+		"Bedrand",
+		"Borstvoedingskussen",
+		"Buggyzak",
+		"Dekentje",
+		"Doopsuiker",
+		"Draagmand",
+		"Draagzak",
+		"Eetset",
+		"Beddegoed extra",
+		"Flesverwarmer",
+		"Geboortegeschenk",
+		"Hangstoel",
+		"Lampje",
+		"Luieremmer",
+		"Luierkussen",
+		"Matrasbeschermer",
+		"Mobiel",
+		"Paraplu",
+		"Parasol",
+		"Plaspotje",
+		"Regenzeil",
+		"Reiskoffer",
+		"Rugzak",
+		"Set Flesjes",
+		"Slaapzak",
+		"Speelboog",
+		"Speelgoedbox",
+		"Speelmat",
+		"Sporttas",
+		"Startersset",
+		"Sterilisator",
+		"Tafel en stoeltjes",
+		"Toiletbril",
+		"Trap- of deurhekje",
+		"Trapje",
+		"Verzorgingstas",
 	}
-	for _, objName := range objectsToAddMaat {
-		object := db.MateriaalObject{}
-		dbConn.GetWhereIs(&object, "naam", objName)
-		dbConn.Add(&db.MateriaalMaat{
-			Naam:              "<onbekend>",
-			MateriaalObjectID: object.ID,
+	for _, objName := range objectsToAddBulk {
+		dbConn.Add(&db.MateriaalObject{
+			Naam:      objName,
+			Categorie: catKleinBabymateriaal,
 		})
-	}*/
+	}
 
 	return err
 }
