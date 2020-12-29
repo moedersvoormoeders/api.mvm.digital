@@ -211,8 +211,8 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catBabymateriaal := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catBabymateriaal, "naam", "Babymateriaal")*/
-	//catVoorMoeder := db.MateriaalCategory{}
-	//dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
+	catVoorMoeder := db.MateriaalCategory{}
+	dbConn.GetWhereIs(&catVoorMoeder, "naam", "Voor Moeder")
 	catSpeelgoed := db.MateriaalCategory{}
 	dbConn.GetWhereIs(&catSpeelgoed, "naam", "Speelgoed")
 	catNaaikamer := db.MateriaalCategory{}
@@ -225,6 +225,21 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	dbConn.GetWhereIs(&catKleinBabymateriaal, "naam", "Klein Babymateriaal")
 
 	objectsToAdd := []db.MateriaalObject{
+		db.MateriaalObject{
+			Naam:      "Doopsuiker",
+			Categorie: catVoorMoeder,
+			Maten:     copySlice(geenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Pantoffels",
+			Categorie: catVoorMoeder,
+			Maten:     copySlice(schoenMaten),
+		},
+		db.MateriaalObject{
+			Naam:      "Hanstas",
+			Categorie: catVoorMoeder,
+			Maten:     copySlice(geenMaten),
+		},
 		db.MateriaalObject{
 			Naam:      "Verjaardag",
 			Categorie: catSpeelgoed,
@@ -246,15 +261,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 			Categorie: catSpeelgoed,
 		},
 		db.MateriaalObject{
-			Naam:      "Kleuterfiets",
-			Categorie: catSpeelgoed,
-		},
-		db.MateriaalObject{
 			Naam:      "Fietshelm",
-			Categorie: catSpeelgoed,
-		},
-		db.MateriaalObject{
-			Naam:      "Extra",
 			Categorie: catSpeelgoed,
 		},
 		db.MateriaalObject{
@@ -267,14 +274,6 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		},
 		db.MateriaalObject{
 			Naam:      "Overgordijnen",
-			Categorie: catNaaikamer,
-		},
-		db.MateriaalObject{
-			Naam:      "Extra",
-			Categorie: catNaaikamer,
-		},
-		db.MateriaalObject{
-			Naam:      "Extra",
 			Categorie: catNaaikamer,
 		},
 		db.MateriaalObject{
@@ -337,7 +336,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		db.MateriaalObject{
 			Naam:      "Buggy dubbel",
 			Categorie: catGrootBabymateriaal,
-			Prijs:     0.5,
+			Prijs:     1.0,
 		},
 		db.MateriaalObject{
 			Naam:      "Buggy enkel",
@@ -405,7 +404,6 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 		"Borstvoedingskussen",
 		"Buggyzak",
 		"Dekentje",
-		"Doopsuiker",
 		"Draagmand",
 		"Draagzak",
 		"Eetset",
