@@ -236,7 +236,7 @@ func (a *materiaalCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 			Maten:     copySlice(schoenMaten),
 		},
 		db.MateriaalObject{
-			Naam:      "Hanstas",
+			Naam:      "Handtas",
 			Categorie: catVoorMoeder,
 			Maten:     copySlice(geenMaten),
 		},
