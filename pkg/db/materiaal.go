@@ -10,10 +10,11 @@ import (
 
 type MateriaalCategory struct {
 	gorm.Model
-	Naam    string `json:"naam"`
-	PerKind bool   `json:"perKind"`
-	OpMaat  bool   `json:"opMaat"`
-	Order   int    `json:"order"`
+	Naam          string `json:"naam"`
+	PerKind       bool   `json:"perKind"`
+	OpMaat        bool   `json:"opMaat"`
+	PrintKindInfo bool   `json:"printKindInfo"`
+	Order         int    `json:"order"`
 }
 
 type MateriaalMaat struct {
