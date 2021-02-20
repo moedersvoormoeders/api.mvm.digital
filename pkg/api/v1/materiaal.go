@@ -14,7 +14,7 @@ import (
 
 func (h *HTTPHandler) getMateriaalObjects(c echo.Context) error {
 	materiaalObjects := []db.MateriaalObject{}
-	res := h.db.Preload(clause.Associations).Find(&materiaalObjects)
+	res := h.db.Preload(clause.Associations).Order("naam").Find(&materiaalObjects)
 
 	if res.Error != nil {
 		// TODO: look into how JS handles this
