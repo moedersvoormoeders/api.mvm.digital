@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gobwas/glob"
+
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth_echo"
 
@@ -148,6 +150,7 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 			return true
 		},
 	}))
+	e.Use(s.checkRBAC)
 
 	// handlers
 	e.GET("/", func(c echo.Context) error {
@@ -186,6 +189,57 @@ type AuthData struct {
 	Password string `form:"password" json:"password"`
 }
 
+func (s *serveCmdOptions) checkRBAC(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		user, ok := c.Get("user").(*jwt.Token)
+		if !ok {
+			// JWT part will handle this
+			return next(c)
+		}
+		claims, ok := user.Claims.(*auth.Claim)
+		if !ok || claims.Name == "" {
+			// JWT part will handle this
+			return next(c)
+		}
+
+		if c.Path() == "/v1/auth/check" {
+			// universally allowed
+			return next(c)
+		}
+
+		roleBindings := []db.RoleBinding{}
+		res := s.db.Preload("Role.Verbs").Preload("Role.Endpoints").Where("user_id = ?", claims.ID).Find(&roleBindings)
+		if res.Error != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"error": res.Error.Error()})
+		}
+
+		for _, rb := range roleBindings {
+			matchVerb := false
+			for _, verb := range rb.Role.Verbs {
+				if verb.Content == c.Request().Method {
+					matchVerb = true
+					break
+				}
+			}
+
+			if matchVerb {
+				for _, endpoint := range rb.Role.Endpoints {
+					g, err := glob.Compile(endpoint.Content)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+					if g.Match(c.Path()) {
+						return next(c)
+					}
+				}
+			}
+		}
+
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "RBAC error: no allowed roles for this path"})
+	}
+}
+
 // TODO: move this!
 func (s *serveCmdOptions) login(c echo.Context) error {
 	data := new(AuthData)
@@ -200,7 +254,6 @@ func (s *serveCmdOptions) login(c echo.Context) error {
 
 	data.Username = strings.ToLower(data.Username)
 
-	// TODO: check login
 	user := db.User{}
 	err = s.db.GetWhereIs(&user, "username", data.Username)
 	if errors.Is(err, db.ErrorNotFound) {
@@ -215,6 +268,7 @@ func (s *serveCmdOptions) login(c echo.Context) error {
 	// Set custom claims
 	claims := &auth.Claim{
 		user.Name,
+		user.ID,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
