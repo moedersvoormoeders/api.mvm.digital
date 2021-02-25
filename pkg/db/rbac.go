@@ -6,27 +6,27 @@ import (
 
 type RoleVerb struct {
 	gorm.Model
-	Content   string
-	RoleRefer uint
+	Content   string `json:"content"`
+	RoleRefer uint   `json:"roleRefer"`
 }
 
 type RoleEndpoint struct {
 	gorm.Model
-	Content   string
-	RoleRefer uint
+	Content   string `json:"content"`
+	RoleRefer uint   `json:"roleRefer"`
 }
 
 type Role struct {
 	gorm.Model
-	Name      string
+	Name      string         `json:"name"`
 	Verbs     []RoleVerb     `gorm:"foreignKey:RoleRefer"`
 	Endpoints []RoleEndpoint `gorm:"foreignKey:RoleRefer"`
 }
 
 type RoleBinding struct {
 	gorm.Model
-	UserID int
-	User   User
-	RoleID int
-	Role   Role
+	UserID int  `json:"userID"`
+	User   User `json:"user"`
+	RoleID int  `json:"roleID"`
+	Role   Role `json:"role"`
 }
