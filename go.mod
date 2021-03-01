@@ -15,7 +15,7 @@ require (
 	github.com/schmorrison/Zoho v0.0.0-20200726181448-707d9fdc8ca7
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.3
-	github.com/spf13/viper v1.4.0
+	github.com/spf13/viper v1.7.1
 	github.com/valyala/fasttemplate v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
