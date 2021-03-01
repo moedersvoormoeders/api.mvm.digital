@@ -5,6 +5,7 @@ go 1.14
 replace github.com/schmorrison/Zoho v0.0.0-20200726181448-707d9fdc8ca7 => github.com/meyskens/Zoho v0.0.0-20200903081837-b98904914dd2
 
 require (
+	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/didip/tollbooth_echo v0.0.0-20190918161726-5adbfff23d88
@@ -13,10 +14,12 @@ require (
 	github.com/labstack/echo/v4 v4.1.16
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/schmorrison/Zoho v0.0.0-20200726181448-707d9fdc8ca7
-	github.com/spf13/cobra v1.0.0
-	github.com/spf13/pflag v1.0.3
-	github.com/spf13/viper v1.4.0
+	github.com/spf13/cobra v1.1.3
+	github.com/spf13/pflag v1.0.5
+	github.com/spf13/viper v1.7.0
+	github.com/ugorji/go v1.1.4 // indirect
 	github.com/valyala/fasttemplate v1.2.0 // indirect
+	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
