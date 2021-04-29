@@ -1,0 +1,24 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: gorm.io/gorm
+    versions:
+    - 1.20.12
+    - 1.21.1
+    - 1.21.2
+    - 1.21.3
+    - 1.21.4
+    - 1.21.5
+    - 1.21.6
+    - 1.21.7
+    - 1.21.8
+  - dependency-name: github.com/labstack/echo/v4
+    versions:
+    - 4.2.0
+    - 4.2.1
