@@ -17,9 +17,7 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.4.0
 	github.com/valyala/fasttemplate v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
-	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
-	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
-	gorm.io/driver/postgres v1.0.0
-	gorm.io/gorm v1.20.0
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	gorm.io/driver/postgres v1.1.0
+	gorm.io/gorm v1.21.9
 )
