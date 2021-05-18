@@ -79,7 +79,7 @@ func (h *HTTPHandler) postMateriaalForKlant(c echo.Context) error {
 	}
 
 	materiaal.Model = materiaalFromDB.Model
-	res := h.db.Updates(&materiaal)
+	res := h.db.Select("*").Updates(&materiaal)
 	if res.Error != nil {
 		return c.JSON(http.StatusInternalServerError, res.Error.Error())
 	}
@@ -90,7 +90,7 @@ func (h *HTTPHandler) postMateriaalForKlant(c echo.Context) error {
 	}
 
 	for _, mat := range materiaal.Gekregen {
-		res := h.db.Updates(&mat)
+		res := h.db.Select("*").Updates(&mat)
 		if res.Error != nil {
 			return c.JSON(http.StatusInternalServerError, res.Error.Error())
 		}
