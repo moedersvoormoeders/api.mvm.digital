@@ -137,8 +137,6 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:  []string{"*"},
-		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		ExposeHeaders: []string{echo.HeaderContentType, echo.HeaderAccept, "Num-Total-Entries"},
 	}))
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
