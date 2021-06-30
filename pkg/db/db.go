@@ -51,8 +51,22 @@ func (c *Connection) DoMigrate() error {
 	c.Migrator().DropConstraint(&MateriaalEntry{}, "fk_materiaal_entries_maat")
 
 	err := c.AutoMigrate(
-		&User{},
+
+		&Categorie{},
+		&Object{},
+		&Maat{},
+		&OntvangEntry{},
+
+		// Voeding
+		&Voeding{},
+
+		// Materiaal
 		&Materiaal{},
+
+		// Auth
+		&User{},
+
+		// deprecated
 		&MateriaalCategory{},
 		&MateriaalEntry{},
 		&MateriaalObject{},

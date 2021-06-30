@@ -1,10 +1,22 @@
 package v1
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
+	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"
 )
+
+var registers []func(e *echo.Echo, h *HTTPHandler)
+
+func init() {
+	registers = append(registers, func(e *echo.Echo, h *HTTPHandler) {
+		e.GET("/v1/auth/check", h.checkAuth)
+	})
+}
 
 type HTTPHandler struct {
 	db *db.Connection
@@ -17,14 +29,31 @@ func NewHTTPHandler(db *db.Connection) *HTTPHandler {
 }
 
 func (h *HTTPHandler) Register(e *echo.Echo) {
-
-	// materiaal
-	e.GET("/v1/materiaal/objects", h.getMateriaalObjects)
-	e.GET("/v1/materiaal/klant/:mvmnummer", h.getMateriaalForKlant)
-	e.POST("/v1/materiaal/klant/:mvmnummer", h.postMateriaalForKlant)
-	e.POST("/v1/sinterklaas/klant/:mvmnummer", h.postSinterklaasForKlant)
+	for _, regFn := range registers {
+		regFn(e, h)
+	}
 
 	//whoami
 	e.GET("/v1/auth/check", h.checkAuth)
 	e.GET("/v1/whoami/roles", h.getRoles)
+}
+
+func Paginate(c echo.Context) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		page, _ := strconv.Atoi(c.QueryParam("page"))
+		if page == 0 {
+			page = 1
+		}
+
+		pageSize, _ := strconv.Atoi(c.QueryParam("page_size"))
+		switch {
+		case pageSize > 100:
+			pageSize = 100
+		case pageSize <= 0:
+			pageSize = 10
+		}
+
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
 }
