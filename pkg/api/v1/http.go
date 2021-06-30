@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
