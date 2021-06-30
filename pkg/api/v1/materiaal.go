@@ -12,6 +12,16 @@ import (
 	"gorm.io/gorm"
 )
 
+func init() {
+	registers = append(registers, func(e *echo.Echo, h *HTTPHandler) {
+		// materiaal
+		e.GET("/v1/materiaal/objects", h.getMateriaalObjects)
+		e.GET("/v1/materiaal/klant/:mvmnummer", h.getMateriaalForKlant)
+		e.POST("/v1/materiaal/klant/:mvmnummer", h.postMateriaalForKlant)
+		e.POST("/v1/sinterklaas/klant/:mvmnummer", h.postSinterklaasForKlant)
+	})
+}
+
 func (h *HTTPHandler) getMateriaalObjects(c echo.Context) error {
 	materiaalObjects := []db.MateriaalObject{}
 	res := h.db.Preload(clause.Associations).Order("naam").Find(&materiaalObjects)
