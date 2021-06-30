@@ -71,6 +71,10 @@ func (c *Connection) DoMigrate() error {
 		&MateriaalEntry{},
 		&MateriaalObject{},
 		&MateriaalMaat{},
+		&RoleEndpoint{},
+		&RoleVerb{},
+		&Role{},
+		&RoleBinding{},
 	)
 	if err != nil {
 		return err

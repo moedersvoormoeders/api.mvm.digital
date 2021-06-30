@@ -7,10 +7,7 @@ import (
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
 	"gorm.io/gorm"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
-
-	"github.com/moedersvoormoeders/api.mvm.digital/pkg/api/auth"
 )
 
 var registers []func(e *echo.Echo, h *HTTPHandler)
@@ -35,15 +32,10 @@ func (h *HTTPHandler) Register(e *echo.Echo) {
 	for _, regFn := range registers {
 		regFn(e, h)
 	}
-}
 
-func (h *HTTPHandler) checkAuth(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*auth.Claim)
-	if claims.Name == "" {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"status": "JWT incorrect"})
-	}
-	return c.JSON(http.StatusOK, echo.Map{"status": "ok"})
+	//whoami
+	e.GET("/v1/auth/check", h.checkAuth)
+	e.GET("/v1/whoami/roles", h.getRoles)
 }
 
 func Paginate(c echo.Context) func(db *gorm.DB) *gorm.DB {

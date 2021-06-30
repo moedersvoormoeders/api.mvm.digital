@@ -6,6 +6,7 @@ import (
 
 type Claim struct {
 	Name string `json:"name"`
+	ID   uint   `json:"id"`
 	// TODO: roles
 	jwt.StandardClaims
 }
