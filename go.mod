@@ -8,6 +8,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/didip/tollbooth_echo v0.0.0-20190918161726-5adbfff23d88
+	github.com/gobwas/glob v0.2.3
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/jinzhu/gorm v1.9.16
 	github.com/labstack/echo/v4 v4.1.17
