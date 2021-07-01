@@ -25,6 +25,9 @@ type Klant struct {
 	AantalOnder12Jaar   int    `json:"aantalOnder12Jaar"`   // TODO: make this automated post-Zoho
 	AantalBovenOf12Jaar int    `json:"aantalBovenOf12Jaar"` // TODO: make this automated post-Zoho
 
+	Geboortedatum string `json:"geboortedatum"` // TODO: make this time.Time post-Zoho
+	Geslacht      string `json:"geslacht"`
+
 	Straat     string `json:"straat"`
 	Huisnummer string `json:"huisnummer"`
 	Postcode   string `json:"postcode"`
@@ -207,5 +210,7 @@ func zohoKlantToGoKlant(entry zohoKlantData) Klant {
 		Huisnummer:          entry.Huisnummer,
 		Postcode:            entry.Postcode,
 		Woonplaats:          entry.Gemeente,
+		Geboortedatum:       entry.Datum1,
+		Geslacht:            entry.Geslacht,
 	}
 }
