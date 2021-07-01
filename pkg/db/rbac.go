@@ -19,8 +19,8 @@ type RoleEndpoint struct {
 type Role struct {
 	gorm.Model
 	Name      string         `json:"name"`
-	Verbs     []RoleVerb     `gorm:"foreignKey:RoleRefer"`
-	Endpoints []RoleEndpoint `gorm:"foreignKey:RoleRefer"`
+	Verbs     []RoleVerb     `json:"verbs" gorm:"foreignKey:RoleRefer"`
+	Endpoints []RoleEndpoint `json:"endpoints" gorm:"foreignKey:RoleRefer"`
 }
 
 type RoleBinding struct {

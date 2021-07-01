@@ -204,7 +204,7 @@ func (s *serveCmdOptions) checkRBAC(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 
-		if c.Path() == "/v1/auth/check" {
+		if strings.HasPrefix(c.Path(), "/v1/auth/") {
 			// universally allowed
 			return next(c)
 		}

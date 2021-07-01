@@ -31,10 +31,6 @@ func (h *HTTPHandler) Register(e *echo.Echo) {
 	for _, regFn := range registers {
 		regFn(e, h)
 	}
-
-	//whoami
-	e.GET("/v1/auth/check", h.checkAuth)
-	e.GET("/v1/whoami/roles", h.getRoles)
 }
 
 func Paginate(c echo.Context) func(db *gorm.DB) *gorm.DB {

@@ -10,6 +10,13 @@ import (
 	"github.com/moedersvoormoeders/api.mvm.digital/pkg/db"
 )
 
+func init() {
+	registers = append(registers, func(e *echo.Echo, h *HTTPHandler) {
+		e.GET("/v1/auth/check", h.checkAuth)
+		e.GET("/v1/auth/whoami/roles", h.getRoles)
+	})
+}
+
 func (h *HTTPHandler) getRoles(c echo.Context) error {
 	roles := []db.Role{}
 
