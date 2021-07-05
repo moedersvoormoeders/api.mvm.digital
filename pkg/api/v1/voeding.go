@@ -16,7 +16,6 @@ import (
 
 func init() {
 	registers = append(registers, func(e *echo.Echo, h *HTTPHandler) {
-		// materiaal
 		e.GET("/v1/voeding/objects", h.getVoedingObjects)
 		e.GET("/v1/voeding/klant/:mvmnummer", h.getVoedingForKlant)
 		e.POST("/v1/voeding/klant/:mvmnummer", h.postVoedingForKlant)
@@ -62,7 +61,7 @@ func (h *HTTPHandler) getVoedingGekregen(c echo.Context) error {
 	}
 
 	var gekregen []db.OntvangEntry
-	h.db.Scopes(Paginate(c)).Where(&db.OntvangEntry{
+	h.db.Order("datum DESC").Scopes(Paginate(c)).Where(&db.OntvangEntry{
 		VoedingID: int(voeding.ID),
 	}).Find(&gekregen)
 
@@ -101,16 +100,6 @@ func (h *HTTPHandler) getVoedingForKlant(c echo.Context) error {
 		log.Println("DB error: ", res.Error)
 		return c.JSON(http.StatusInternalServerError, res.Error.Error())
 	}
-
-	err := h.db.FillGekregen(voeding.Gekregen)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, res.Error.Error())
-	}
-
-	// sort by Go till i figure out how to do it in Gorm
-	sort.Slice(voeding.Gekregen, func(i, j int) bool {
-		return voeding.Gekregen[i].Datum.Unix() > voeding.Gekregen[j].Datum.Unix()
-	})
 
 	return c.JSON(http.StatusOK, voeding)
 }
