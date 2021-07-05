@@ -6,8 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	zoho "github.com/schmorrison/Zoho"
 	"github.com/schmorrison/Zoho/crm"
 
@@ -143,9 +141,7 @@ func (a *voedingImportCmdOptions) RunE(cmd *cobra.Command, args []string) error 
 			out, err = c.GetRecord(&zohoVoeding{}, "Voeding", dataID)
 
 			if err != nil {
-				spew.Dump(out)
 				log.Println(entry.DoelgroepNummer, err)
-				panic(err)
 				continue
 			}
 
