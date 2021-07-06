@@ -18,9 +18,25 @@ func NewHTTPHandler() *HTTPHandler {
 func (h *HTTPHandler) Register(e *echo.Echo, z *zoho.CRM) {
 	h.zohoCRM = z
 
+	e.GET("/zoho/search/", h.getKlantSearch)
 	e.GET("/zoho/klant/", h.getKlantForMVMNummer)
 	e.GET("/zoho/contacten/", h.getContactenForMVMNummer)
 	e.GET("/zoho/sinterklaas/", h.getSinterklaasForMVMNummer)
+}
+
+func (h *HTTPHandler) getKlantSearch(c echo.Context) error {
+	query := c.QueryParam("query")
+
+	if query == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "missing search query query parameter"})
+	}
+
+	klant, err := h.zohoCRM.GetKlantenForQuery(query)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, klant)
 }
 
 func (h *HTTPHandler) getKlantForMVMNummer(c echo.Context) error {

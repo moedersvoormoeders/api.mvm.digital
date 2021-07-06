@@ -192,6 +192,26 @@ func (c *CRM) GetKlantForMVMNummer(mvmNummer string) (Klant, error) {
 	return Klant{}, ErrNotFound
 }
 
+func (c *CRM) GetKlantenForQuery(query string) ([]Klant, error) {
+	resp, err := c.zohoCRM.SearchRecords(&zohoKlant{}, "Accounts", map[string]zoho.Parameter{
+		"word":     zoho.Parameter(query),
+		"per_page": "200",
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	data := resp.(*zohoKlant)
+
+	var out []Klant
+	for _, entry := range data.Data {
+		out = append(out, zohoKlantToGoKlant(entry))
+	}
+
+	return out, nil
+}
+
 func zohoKlantToGoKlant(entry zohoKlantData) Klant {
 	return Klant{
 		ZohoID:              entry.ID,
